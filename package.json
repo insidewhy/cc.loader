@@ -1,0 +1,21 @@
+{
+    "name":    "commoncommon",
+    "description": "A javascript module loading/creation system for nodejs and the web including support for baking. Written in coffeescript.",
+    "author": {
+      "name": "James Pike"
+    },
+    "version": "0.0.0",
+    "dependencies": {
+        "coffee-script": "1.3.3",
+        "underscore":    "1.3.3"
+    },
+    "engines": {
+      "node": ">=0.4.0"
+    },
+    "directories": {
+        "lib": "./lib/commoncommon"
+    },
+    "bin": {
+        "ccbaker": "./bin/ccbaker"
+    }
+}
