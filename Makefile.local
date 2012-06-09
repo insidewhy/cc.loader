@@ -1,0 +1,4 @@
+.PHONY: test
+
+test:
+	./bin/ccbaker -v -l test/basic root

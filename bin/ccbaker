@@ -1,9 +1,7 @@
 #!/usr/bin/env coffee
 
 path = require 'path'
-fs   = require 'fs'
-lib  = path.join path.dirname(fs.realpathSync __filename), '../lib'
 
-do require(lib + '/commoncommon/command').run
+require(path.join __dirname, '../lib/commoncommon/baker').run process.argv
 
 # vi:filetype=coffee
