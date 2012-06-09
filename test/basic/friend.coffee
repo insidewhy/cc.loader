@@ -1,5 +1,8 @@
 cc.module('friend')
   .requires('pet.cat')
-  .defines () ->
+  .defines (meta) ->
+    meta.log = ->
+      jconsole.log 'friend'
+    pet.cat.talk "friend"
 
 # vim:ts=2 sw=2

@@ -23,8 +23,30 @@ cc.module('root')
     // global variables directly.
   })
 ```
-
 A modules name relates to its browser path, so "other.submodule" is loaded from "lib/other/submodule.js" or "lib/other/submodule.coffee" (the prefix "lib" can be customised).
+
+An example showing two modules split over two files:
+```javascript
+// file: lib/pet/cat.js
+cc.module('pet.cat')
+  .defines (function(self) {
+    self.talk = function(word) { alert('mew' + word + 'mew'); }
+  })
+```
+
+```javascript
+// file: lib/root.js
+cc.module('root')
+  .defines (function() {
+    pet.cat.talk('prr');
+
+    // this module elects not to use self and sets global variables manually.
+    cc.global.Root = "important string!!"
+
+    // cc.global is a reference to the global "window" object in javascript, or
+    // "global" under node.
+  })
+```
 
 baking
 ------
