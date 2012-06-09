@@ -1,8 +1,8 @@
 console = require 'console'
 path = require 'path'
 
-libdir = 'lib'
-
+libdir = null # full path to root of library tree
+rootModulePath = null # directory containing root module
 packing = {}
 packed = {}
 
@@ -12,8 +12,8 @@ verbose = (tolog...) ->
   console.warn tolog.join(' ')
 
 moduleToPath = (mod) ->
-  filebase = mod.replace(/\./g, '/')
-  return path.join(process.cwd(), libdir, filebase)
+  filebase = mod.replace /\./g, '/'
+  return path.join libdir, filebase
 
 packModule = (mod) ->
   if packed[mod]
@@ -35,6 +35,17 @@ packModule = (mod) ->
 class Module
   constructor: (@name) ->
   requires: (libs...) ->
+    if not libdir
+      libdir = path.join process.cwd(), rootModulePath
+      idx = @name.indexOf '.'
+      while -1 != idx
+        console.log "#{libdir} to #{path.dirname libdir}"
+        libdir = path.dirname libdir
+        idx = @name.indexOf '.', idx
+      verbose "got libdir #{libdir}"
+
+      # determine from current path
+
     verbose "module #{@name} requires #{libs}"
     for lib in libs
       packModule lib
@@ -50,10 +61,9 @@ global.cc = new CC
 
 usage = () ->
   console.log """
-    ccbaker [arguments] module.path
+    ccbaker [arguments] <path to root module>
       arguments:
-        -c            compile coffeescript modules to javascript only.
-        -l  [path]    path containing all libraries, default: lib
+        -c            compile coffeescript modules to javascript only
         -m            minify javascript
         -w  [path]    output baked file to [path] and keep watching all reachable
                       paths for changes, recreating baked file as they change
@@ -65,11 +75,8 @@ exports.run = (argv) ->
     return
 
   argvIdx = 2
-  loop
+  while argv[argvIdx][0] == '-'
     switch argv[argvIdx]
-      when '-l'
-        libdir = argv[argvIdx + 1]
-        argvIdx += 2
       when '-v'
         _verbose = true
         ++argvIdx
@@ -79,12 +86,12 @@ exports.run = (argv) ->
       when '-w', '-m'
         console.warn "sorry, #{argv[argvIdx]} is not yet supported"
         return
-      else break
 
-  if not libdir
-    console.log "missing argument after -l"
-    return
-
-  packModule argv[argvIdx]
+  mod = argv[argvIdx]
+  packing[mod] = true
+  rootModulePath = path.dirname mod
+  require path.join process.cwd(), mod
+  delete packing[mod]
+  packed[mod] = 1
 
 # vim:ts=2 sw=2

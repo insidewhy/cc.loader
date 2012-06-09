@@ -21,7 +21,7 @@ cc.module('root')
   })
 ```
 
-A modules name relates to its path in the filesystem, so "other.submodule" is loaded from "lib/other/submodule.js" or "lib/other/submodule.coffee".
+A modules name relates to its browser path, so "other.submodule" is loaded from "lib/other/submodule.js" or "lib/other/submodule.coffee" (the prefix "lib" can be customised).
 
 baking
 ------
@@ -30,21 +30,17 @@ Baked html can be used directly from the browser. This speeds up loading your we
 To bake the module above together with its dependencies:
 
 ```shell
-$ ccbaker root > output.js
+$ ccbaker root.js > output.js
 ```
 
-A different library prefix can be set with -l.
-```shell
-$ ccbaker -l lib2 root > output.js
-```
+The root directory is worked out based on the name of the root module and where it sits in the file-system tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but "baker" at lib/hello/baker.js would set the root to "lib/hello".
 
 Full arguments:
 ```shell
 $ ccbaker -h
-ccbaker [arguments] module.path
+ccbaker [arguments] <path to root module>
   arguments:
-    -c            compile coffeescript modules to javascript only.
-    -l  [path]    path containing all libraries, default: lib
+    -c            compile coffeescript modules to javascript only
     -m            minify javascript
     -w  [path]    output baked file to [path] and keep watching all reachable
                   paths for changes, recreating baked file as they change
@@ -56,7 +52,7 @@ using unbaked modules
 To use from html without baking:
 ```html
 <script type="text/javascript" src="commoncommon.js">
-    cc.libpath = 'lib' // the default path containing all your modules.
+    cc.libpath = 'lib'; // the default URL containing all your modules.
 
     // assumes your root module is at "lib/root/master.js". This will in turn load
     // all dependency modules and you will be able to debug them with their full
@@ -67,5 +63,5 @@ To use from html without baking:
 
 dependencies
 ============
- * baker: npm and node. npm will fetch other node module depencies for you.
+ * baker: node.js, npm will fetch other node module dependencies for you.
  * web: nothing to use the library or a baked library.
