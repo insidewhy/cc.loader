@@ -5,6 +5,7 @@ libdir = null # full path to root of library tree
 rootModulePath = null # directory containing root module
 packing = {}
 packed = {}
+moduleOrder = [] # modules ordered with dependencies first
 
 _verbose = false
 verbose = (tolog...) ->
@@ -51,6 +52,7 @@ class Module
       packModule lib
     this
   defines: () ->
+    moduleOrder.push this
     this
 
 class CC
@@ -93,5 +95,7 @@ exports.run = (argv) ->
   require path.join process.cwd(), mod
   delete packing[mod]
   packed[mod] = 1
+
+  verbose "modules:", [ mod.name for mod in moduleOrder ]
 
 # vim:ts=2 sw=2

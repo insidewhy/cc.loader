@@ -16,8 +16,11 @@ To create a module with dependencies:
 ```javascript
 cc.module('root')
   .requires('module', 'other.submodule')
-  .defines (function() {
+  .defines (function(self) {
     // code for this module
+    // any variables you add to "self" will be proprogated an object reachable at
+    // other.submodule, although you can always ignore the argument and just manipulate
+    // global variables directly.
   })
 ```
 
@@ -51,8 +54,10 @@ using unbaked modules
 ---------------------
 To use from html without baking:
 ```html
-<script type="text/javascript" src="commoncommon.js">
-    cc.libpath = 'lib'; // the default URL containing all your modules.
+<script type="text/javascript" src="cc.js"></script>
+<script type="text/javascript">
+    cc.libpath = 'lib'; // URL to the folder containing all your modules.
+                        // lib is the default.
 
     // assumes your root module is at "lib/root/master.js". This will in turn load
     // all dependency modules and you will be able to debug them with their full

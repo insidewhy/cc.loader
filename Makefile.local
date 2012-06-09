@@ -1,4 +1,0 @@
-.PHONY: test
-
-test:
-	./bin/ccbaker -v ./test/basic/root.js
