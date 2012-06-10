@@ -37,7 +37,7 @@ class Module
       false
 
     if hasKey()
-      cc.namespaceValue @name, self
+      cc.set @name, self
 
     for onload in @onloads
       do onload
@@ -52,24 +52,27 @@ class CC
 
   module: (name) ->
     mod = @modules[name]
-    return mod if mod
-    alert "cannot instantiate module #{name} before requiring it"
-
+    if mod
+      return mod
+    else
+      # this corresponds to a second module defined in a file that can't be
+      # externally referenced via "cc.requires".
+      return cc.modules[name] = new Module name
 
   # set a value at a particular namespace under global
   # e.g. ns = "hey.baby", val = "1"
   #   -> global.hey.baby = 1
-  namespaceValue: (ns, val) ->
+  set: (ns, val) ->
     obj = @global
     components = ns.split '.'
     for space in components[0...(components.length - 1)]
       newObj = obj[space]
       if not newObj
         obj = obj[space] = {}
-      else if typeof newObj == 'Object'
+      else if typeof newObj == 'object'
         obj = newObj
       else
-        alert "namespace conflict, #{ns} = #{newObj}"
+        alert "namespace conflict, #{ns} = #{newObj} of #{typeof newObj}"
 
     lastComp = components[components.length - 1]
     obj[lastComp] = val
@@ -98,15 +101,15 @@ class CC
     path = @libpath + '/' + name.replace(/\./g, '/') + '.js'
     script = document.createElement 'script'
     script.type = 'text/javascript'
-    if callback
-      script.onerror = () ->
-        mod.failed = true
-        callback(name)
-    else
-      script.onerror = () ->
-        mod.failed = true
-        alert "error requiring #{name}"
     script.src = path
+    # script.onload = -> console.log "#{path} loaded"
+    script.onerror = ->
+      # console.log "failed to load #{path}"
+      mod.failed = true
+      if callback
+        callback(name)
+      else
+        alert "error requiring #{name}"
     @head.appendChild script
     # require a module, which in turn will require its dependencies
 

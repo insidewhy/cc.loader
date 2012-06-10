@@ -48,6 +48,8 @@ cc.module('root')
   })
 ```
 
+You can put multiple modules in a single file but only the module which has the path corresponding to the filesystem path is publically available.
+
 baking
 ------
 Baked html can be used directly from the browser. This speeds up loading your website a great deal but you will lose path information when javascript debugging. 
