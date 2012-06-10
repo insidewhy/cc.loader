@@ -20,9 +20,9 @@ cc.module('root')
     // code for this module
   });
 ```
-defines runs after the module dependencies have loaded.
+defines runs after the required modules have loaded.
 
-A modules name relates to its browser path, so "other.submodule" is loaded from "lib/other/submodule.js" or "lib/other/submodule.coffee" (the prefix "lib" can be customised).
+Each commoncommon module file must define a module name corresponding to its path otherwise the module  will fail to load (but with a helpful error message). For example "other.submodule" must be defined in "other/submodule.js" or "other/submodule.coffee". A configurable prefix which defaults to "lib" can also be prepended to the script path. Conversely when requiring a module as a dependency the filesystem path to load it from is determined from the module path.
 
 examples
 --------
@@ -74,7 +74,7 @@ cc.module('root')
   });
 ```
 
-You can put multiple modules in a single file but only the module which has a name corresponding to the filesystem path is publically available.
+You can put multiple modules in a single file but only things defined by the module which has a name corresponding to the filesystem path is publically available.
 
 baking
 ------
@@ -86,7 +86,7 @@ To bake the module above together with its dependencies:
 $ ccbaker root.js > output.js
 ```
 
-The root directory is worked out based on the name of the root module and where it sits in the file-system tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but "baker" at lib/hello/baker.js would set the root to "lib/hello".
+The root directory is worked out based on the name of the root module and where it sits in the filesystem tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but "baker" at lib/hello/baker.js would set the root to "lib/hello".
 
 Full arguments:
 ```shell
