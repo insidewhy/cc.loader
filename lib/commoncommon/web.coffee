@@ -51,6 +51,15 @@ class Module
 
 class CC
   constructor: ->
+    @firefoxVersion = -1 != navigator.userAgent.indexOf "Firefox"
+    @ieVersion =
+      if navigator.appName == 'Microsoft Internet Explorer'
+        re  = /MSIE ([0-9]{1,}[\.0-9]{0,})/
+        if re.exec navigator.userAgent
+          parseFloat RegExp.$1
+        else 0
+      else 0
+    # alert "firefox: #{@firefoxVersion}, ie: #{@ieVersion}"
     @libpath = 'lib'
     @modules = {}
     @global = window
@@ -83,31 +92,36 @@ class CC
     lastComp = components[components.length - 1]
     obj[lastComp] = val
 
+  scriptOnload: (script, onload) ->
+    if script.readyState
+      # IE is different
+      script.onreadystatechange = ->
+        switch script.readyState
+          when "loaded", "complete"
+            do onload
+            script.onreadystatechange = null
+    else
+      script.onload = onload
+    return
+
   # loads a script into the head of the browser and call success/error callbacks
   loadScript: (path, onload, onerror) ->
     script = document.createElement 'script'
-
     script.type = 'text/javascript'
 
-    if ('file:' == document.location?.protocol and
-        -1 != navigator.userAgent.indexOf("Firefox"))
-      # firefox can't catch onerror for files so set a timer
+    if 'file:' == document.location?.protocol and @firefoxVersion
+      # firefox can't catch onerror for files so have to poll
       loaded = false
-      script.onload = ->
+      @scriptOnload script, ->
         loaded = true
         do onload if onload
 
       setTimeout(
         -> do onerror unless loaded
         2000)
-
-      false
     else
-      script.onload = onload if onload
+      @scriptOnload script, onload if onload
       script.onerror = onerror if onerror
-      # in firefox onerror doesn't fire when loading files so schedule a
-      # timer to check the file has loaded
-      # load via ajax and set text
 
     script.src = path
     @head.appendChild script
@@ -144,18 +158,13 @@ class CC
       null
       # ->
       #   # success handler
-      #   console.log "loaded #{mod.name}"
+      #   alert "loaded #{mod.name}"
       ->
         mod.status = 'failed'
         if callback
           callback(name)
         else
           alert "error requiring #{name}")
-
-    unless @_monitored
-      @_monitored = true
-      # TODO: if IE or Firefox from file:/// then somehow find script load
-      #       error then delete @monitored
 
     @this
 
