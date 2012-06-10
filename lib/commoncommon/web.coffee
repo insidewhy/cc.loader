@@ -90,16 +90,24 @@ class CC
     obj = @global
     components = ns.split '.'
     for space in components[0...(components.length - 1)]
-      newObj = obj[space]
-      if not newObj
+      current = obj[space]
+      if not current
         obj = obj[space] = {}
-      else if typeof newObj == 'object'
-        obj = newObj
+      else if typeof current == 'object'
+        obj = current
       else
-        alert "namespace conflict, #{ns} = #{newObj} of #{typeof newObj}"
+        alert "namespace conflict, #{ns} = #{current} of #{typeof current}"
 
     lastComp = components[components.length - 1]
-    obj[lastComp] = val
+    current = obj[lastComp]
+    if current
+      if typeof current == 'object' and typeof val == 'object'
+        for own key, subval of val
+          current[key] = subval
+      else
+        alert "namespace conflict, #{ns} = #{current} of #{typeof current}"
+    else
+      obj[lastComp] = val
 
   scriptOnload: (script, onload) ->
     if script.readyState

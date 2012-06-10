@@ -18,20 +18,46 @@ cc.module('root')
   .requires('module', 'other.submodule')
   .defines (function(self) {
     // code for this module
-    // any variables you add to "self" will be proprogated an object reachable at
-    // other.submodule, although you can always ignore the argument and just manipulate
-    // global variables directly.
-  })
+  });
 ```
+defines runs after the module dependencies have loaded.
+
 A modules name relates to its browser path, so "other.submodule" is loaded from "lib/other/submodule.js" or "lib/other/submodule.coffee" (the prefix "lib" can be customised).
 
-An example showing two modules split over two files:
+examples
+--------
+Populating a module with cc.set
+```javascript
+cc.module('root')
+  .defines(function() {
+    cc.set('root.SayingsOf', { cat: 'meow', dog: 'woof' });
+    cc.set('root.favourite', 'cat');
+
+    // also now avaliable to all including modules.
+    var catSays   = root.SayingsOf.cat,
+        favourite = root.favourite;
+  });
+```
+
+Populating a module through the defines callback argument
+```javascript
+cc.module('pet.cat')
+  .defines(function(self) {
+    self.style = "sleepy";
+    // pet.cat.style will be available to all modules that require pet.cat
+    // The "pet.cat" namespace will only be created if the self object contains
+    // at least one key, otherwise other mechanisms like cc.set can be used
+    // to populate the module namespace and/or other namespaces.
+  });
+```
+
+Two modules split over two files:
 ```javascript
 // file: lib/pet/cat.js
 cc.module('pet.cat')
   .defines (function(self) {
     self.talk = function(word) { alert('mew' + word + 'mew'); }
-  })
+  });
 ```
 
 ```javascript
@@ -45,7 +71,7 @@ cc.module('root')
 
     // cc.global is a reference to the global "window" object in javascript, or
     // "global" under node.
-  })
+  });
 ```
 
 You can put multiple modules in a single file but only the module which has a name corresponding to the filesystem path is publically available.
