@@ -108,6 +108,7 @@ class CC
     script.onerror = ->
       # this doesn't work directly.. is called later after dom completion
       mod.failed = true
+      delete mod.loading
       if callback
         callback(name)
       else

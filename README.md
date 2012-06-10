@@ -48,7 +48,7 @@ cc.module('root')
   })
 ```
 
-You can put multiple modules in a single file but only the module which has the path corresponding to the filesystem path is publically available.
+You can put multiple modules in a single file but only the module which has a name corresponding to the filesystem path is publically available.
 
 baking
 ------
