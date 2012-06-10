@@ -79,6 +79,8 @@ class CC
 
   # require module name, with optional callback on success.
   # passes failed module name to callback on error, null on success.
+  # the callback is only called after the module and all of its dependencies
+  # have loaded.
   require: (name, callback) ->
     mod = @modules[name]
     if mod
@@ -99,20 +101,33 @@ class CC
     mod.pushOnload callback if callback
 
     path = @libpath + '/' + name.replace(/\./g, '/') + '.js'
-    script = document.createElement 'script'
+    script = mod.script = document.createElement 'script'
     script.type = 'text/javascript'
     script.src = path
     # script.onload = -> console.log "#{path} loaded"
     script.onerror = ->
-      # this doesn't work, need a timer or something :(
-      # console.log "failed to load #{path}"
+      # this doesn't work directly.. is called later after dom completion
       mod.failed = true
       if callback
         callback(name)
       else
         alert "error requiring #{name}"
+
     @head.appendChild script
-    # require a module, which in turn will require its dependencies
+
+    # script.onerror doesn't work directly so have to wait for the document
+    # readystatechange to go back to complete. at this stage any unloaded
+    # script has its "onerror" event manually called.
+    unless @_monitored
+      @_monitored = true
+      document.onreadystatechange = =>
+        return unless 'complete' == document.readyState
+        delete @_monitored
+        for own name, mod of @modules
+          if mod.loading and mod.script
+            do mod.script.onerror
+
+    @this
 
 window.cc = new CC
 
