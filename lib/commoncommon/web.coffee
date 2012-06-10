@@ -83,6 +83,37 @@ class CC
     lastComp = components[components.length - 1]
     obj[lastComp] = val
 
+  # loads a script into the head of the browser and call success/error callbacks
+  loadScript: (path, onload, onerror) ->
+    script = document.createElement 'script'
+
+    script.type = 'text/javascript'
+
+    if ('file:' == document.location?.protocol and
+        -1 != navigator.userAgent.indexOf("Firefox"))
+      # firefox can't catch onerror for files so set a timer
+      loaded = false
+      script.onload = ->
+        loaded = true
+        do onload if onload
+
+      setTimeout(
+        -> do onerror unless loaded
+        2000)
+
+      false
+    else
+      script.onload = onload if onload
+      script.onerror = onerror if onerror
+      # in firefox onerror doesn't fire when loading files so schedule a
+      # timer to check the file has loaded
+      # load via ajax and set text
+
+    script.src = path
+    @head.appendChild script
+    script
+
+
   # require module name, with optional callback on success.
   # passes failed module name to callback on error, null on success.
   # the callback is only called after the module and all of its dependencies
@@ -108,21 +139,18 @@ class CC
     mod.pushOnload callback if callback
 
     path = @libpath + '/' + name.replace(/\./g, '/') + '.js'
-    script = mod.script = document.createElement 'script'
-    script.type = 'text/javascript'
-    script.src = path
-    # script.onload = -> console.log "#{path} loaded"
-
-    # onerror only seems to fire automatically in chrome
-    script.onerror = ->
-      # this doesn't work directly.. is called later after dom completion
-      mod.status = 'failed'
-      if callback
-        callback(name)
-      else
-        alert "error requiring #{name}"
-
-    @head.appendChild script
+    @loadScript(
+      path
+      null
+      # ->
+      #   # success handler
+      #   console.log "loaded #{mod.name}"
+      ->
+        mod.status = 'failed'
+        if callback
+          callback(name)
+        else
+          alert "error requiring #{name}")
 
     unless @_monitored
       @_monitored = true
