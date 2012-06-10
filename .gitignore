@@ -1,4 +1,10 @@
-node_modules
 .*.swp
-*.js
 Makefile.local
+/node_modules
+/test/web/cc.js
+/test/web/friend.js
+/test/web/jconsole.js
+/test/web/incmissing.js
+/test/web/pet/cat.js
+/test/web/pet/dog.js
+/cc.js

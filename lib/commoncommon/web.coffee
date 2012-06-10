@@ -8,23 +8,25 @@ class Module
   pushOnload: (callback) ->
     # push a callback to run after this module and all its dependencies have loaded
     @onloads.push callback
+    this
   defines: (@defineCallback) ->
-    unless @deps
+    do @_loadModuleScript
+  _loadModuleScript: ->
+    if not @deps
       do @_define
-      return this
+    else
+      toLoad = @deps.length
+      onLoad = (errMod) =>
+        # console.log "loaded dep of #{@name}"
+        if errMod
+          alert "#{@name}: error loading dependency #{errMod}"
+          if @script and @script.onerror and @status != 'failed'
+            do @script.onerror
+        else if 0 == --toLoad
+          do @_define
 
-    toLoad = @deps.length
-    onLoad = (errMod) =>
-      # console.log "loaded dep of #{@name}"
-      if errMod
-        alert "#{@name}: error loading dependency #{errMod}"
-        @status = 'failed'
-      else if 0 == --toLoad
-        do @_define
-
-    for dep in @deps
-      cc.require dep, onLoad
-
+      for dep in @deps
+        cc.require dep, onLoad
     this
   _define: ->
     # console.log "define #{@name}"
@@ -48,6 +50,7 @@ class Module
 
     do onload for onload in @onloads
     delete @onloads
+    return
 
 class CC
   constructor: ->
@@ -164,6 +167,7 @@ class CC
       #   # success handler
       #   alert "loaded #{mod.name}"
       ->
+        return if 'failed' == mod.status
         mod.status = 'failed'
         if callback
           callback(name)
