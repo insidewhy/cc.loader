@@ -1,6 +1,6 @@
 class Module
   constructor: (@name) ->
-    @loading = true
+    @status = 'loading'
     @onloads = []
   requires: (libs...) ->
     @deps = libs
@@ -15,9 +15,10 @@ class Module
 
     toLoad = @deps.length
     onLoad = (errMod) =>
+      # console.log "loaded dep of #{@name}"
       if errMod
         alert "#{@name}: error loading dependency #{errMod}"
-        delete @loading
+        @status = 'failed'
       else if 0 == --toLoad
         do @_define
 
@@ -27,9 +28,15 @@ class Module
     this
   _define: ->
     # console.log "define #{@name}"
-    delete @loading
+    @status = 'defined'
     self = {}
-    @defineCallback self
+
+    try
+      @defineCallback self
+    catch e
+      @status = 'failed'
+      alert "#{@name}.defines failed: #{e}"
+      onload @name for onload in @onloads
 
     hasKey = () ->
       for own key of self
@@ -39,8 +46,7 @@ class Module
     if hasKey()
       cc.set @name, self
 
-    for onload in @onloads
-      do onload
+    do onload for onload in @onloads
     delete @onloads
 
 class CC
@@ -84,15 +90,16 @@ class CC
   require: (name, callback) ->
     mod = @modules[name]
     if mod
-      if mod.failed
-        # console.log "require #{name} failed"
-        callback name
-      else if mod.loading
-        # console.log "require #{name} is loading"
-        mod.pushOnload callback if callback
-      else
-        # console.log "require #{name} loaded"
-        do callback
+      if callback
+        if 'failed' == mod.status
+          # console.log "require #{name} failed"
+          callback name
+        else if 'loading' == mod.status
+          # console.log "require #{name} is loading"
+          mod.pushOnload callback
+        else
+          # console.log "require #{name} loaded"
+          do callback
       return this
 
     # console.log "require #{name} first"
@@ -105,10 +112,11 @@ class CC
     script.type = 'text/javascript'
     script.src = path
     # script.onload = -> console.log "#{path} loaded"
+
+    # onerror only seems to fire automatically in chrome
     script.onerror = ->
       # this doesn't work directly.. is called later after dom completion
-      mod.failed = true
-      delete mod.loading
+      mod.status = 'failed'
       if callback
         callback(name)
       else
@@ -116,17 +124,10 @@ class CC
 
     @head.appendChild script
 
-    # script.onerror doesn't work directly so have to wait for the document
-    # readystatechange to go back to complete. at this stage any unloaded
-    # script has its "onerror" event manually called.
     unless @_monitored
       @_monitored = true
-      document.onreadystatechange = =>
-        return unless 'complete' == document.readyState
-        delete @_monitored
-        for own name, mod of @modules
-          if mod.loading and mod.script
-            do mod.script.onerror
+      # TODO: if IE or Firefox from file:/// then somehow find script load
+      #       error then delete @monitored
 
     @this
 

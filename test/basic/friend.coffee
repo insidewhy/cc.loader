@@ -9,7 +9,7 @@ cc.module('friend')
 # required, and doesn't have a name corresponding to any filesystem path.
 cc.module('enemy')
   .requires('pet.dog')
-  .defines () ->
+  .defines ->
     pet.dog.talk "enemy"
 
 # vim:ts=2 sw=2
