@@ -2,15 +2,19 @@ class Module
   constructor: (@name) ->
     @status = 'loading'
     @onloads = []
+
   requires: (libs...) ->
     @deps = libs
     this
+
   pushOnload: (callback) ->
     # push a callback to run after this module and all its dependencies have loaded
     @onloads.push callback
     this
+
   defines: (@defineCallback) ->
     do @_loadModuleScript
+
   _loadModuleScript: ->
     if not @deps
       do @_define
@@ -28,6 +32,7 @@ class Module
       for dep in @deps
         cc.require dep, onLoad
     this
+
   _define: ->
     # console.log "define #{@name}"
     @status = 'defined'

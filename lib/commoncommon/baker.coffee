@@ -35,6 +35,7 @@ packModule = (mod) ->
 
 class Module
   constructor: (@name) ->
+
   requires: (libs...) ->
     if not libdir
       libdir = path.join process.cwd(), rootModulePath
@@ -51,9 +52,12 @@ class Module
     for lib in libs
       packModule lib
     this
+
   defines: () ->
     moduleOrder.push this
     this
+
+  jooseClass: -> do @defines
 
 class CC
   module: (name) ->
