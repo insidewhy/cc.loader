@@ -90,6 +90,27 @@ To use from html without baking:
 </script>
 ```
 
+If some of your scripts require access to the dom then you may wish to do your original require in body.onload or jquery.ready:
+```html
+<script type="text/javascript" src="cc.js"></script>
+<script type="text/javascript">
+    cc.libpath = 'lib';
+    $.ready(function() {
+        cc.require("root.master");
+    })
+</script>
+```
+
+notes on development
+--------------------
+IE makes it impossible to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module strucure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
+
+The poll timeout can be set with the following code and should be set before requiring the first module:
+
+```javascript
+cc.ieScriptPollTimeout = 5000; // in milliseconds, 5000 is the default
+```
+
 dependencies
 ============
  * baker: node.js, npm will fetch other node module dependencies for you.

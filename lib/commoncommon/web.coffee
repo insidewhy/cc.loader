@@ -64,6 +64,7 @@ class CC
     @modules = {}
     @global = window
     @head = document.getElementsByTagName('head')[0]
+    @ieScriptPollTimeout = 5000
 
   module: (name) ->
     mod = @modules[name]
@@ -120,7 +121,10 @@ class CC
         -> do onerror unless loaded
         2000)
     else
-      @scriptOnload script, onload if onload
+      # IE just messes the onload up.
+      @scriptOnload script, onload if onload if not @ieVersion
+      # IE also messes up automatically calling this, so a timeout is set
+      # in cc.require to test it later
       script.onerror = onerror if onerror
 
     script.src = path
@@ -153,7 +157,7 @@ class CC
     mod.pushOnload callback if callback
 
     path = @libpath + '/' + name.replace(/\./g, '/') + '.js'
-    @loadScript(
+    mod.script = @loadScript(
       path
       null
       # ->
@@ -166,7 +170,27 @@ class CC
         else
           alert "error requiring #{name}")
 
-    @this
+    if @ieVersion and not @_pollingForStupidIE
+      loadingModules = []
+      @_pollingForStupidIE = setInterval(
+        =>
+          for mod in loadingModules
+            if 'loading' == mod.status
+              do mod.script.onerror # will set status to "failed"
+
+          loadingModules.length = 0
+          for own key, mod of @modules when mod.script and mod.status == 'loading'
+            loadingModules.push mod
+
+          if not loadingModules.length
+            clearInterval @_pollingForStupidIE
+            delete @_pollingForStupidIE
+
+          return
+          # iterate through all modules looking for any that haven't loaded
+        @ieScriptPollTimeout)
+
+    this
 
 window.cc = new CC
 
