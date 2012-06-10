@@ -63,6 +63,7 @@ cc.module('pet.cat')
 ```javascript
 // file: lib/root.js
 cc.module('root')
+  .requires('pet.cat')
   .defines (function() {
     pet.cat.talk('prr');
 
