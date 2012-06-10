@@ -59,9 +59,9 @@ class CC
       # externally referenced via "cc.requires".
       return cc.modules[name] = new Module name
 
-  # set a value at a particular namespace under global
+  # set a value at a particular namespace under @global
   # e.g. ns = "hey.baby", val = "1"
-  #   -> global.hey.baby = 1
+  #   -> hey.baby = 1
   set: (ns, val) ->
     obj = @global
     components = ns.split '.'
@@ -104,6 +104,7 @@ class CC
     script.src = path
     # script.onload = -> console.log "#{path} loaded"
     script.onerror = ->
+      # this doesn't work, need a timer or something :(
       # console.log "failed to load #{path}"
       mod.failed = true
       if callback
