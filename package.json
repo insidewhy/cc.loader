@@ -13,7 +13,8 @@
     },
     "devDependencies": {
         "jasmine-node":  "1.0.26",
-        "express":  "2.5.9"
+        "express":  "2.5.9",
+        "joose": "3.50.0"
     },
     "licenses": [
         {
@@ -22,6 +23,9 @@
     ],
     "engines": {
       "node": ">=0.4.0"
+    },
+    "scripts": {
+        "install": "./node_modules/coffee-script/bin/coffee -p lib/commoncommon/web.coffee > cc.js"
     },
     "directories": {
         "lib": "./lib/commoncommon"
