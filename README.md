@@ -90,12 +90,12 @@ To bake the module above together with its dependencies:
 $ ccbaker root.js > output.js
 ```
 
-The root directory is worked out based on the name of the root module and where it sits in the filesystem tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but "baker" at lib/hello/baker.js would set the root to "lib/hello".
+The root directory is worked out based on the name of the module in the first source file passed and where it sits in the filesystem tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but "baker" at lib/hello/baker.js would set the root to "lib/hello".
 
 Full arguments:
 ```shell
 $ ccbaker -h
-ccbaker [arguments] <path to root module>
+ccbaker [arguments] <paths to source files>
   arguments:
     -c            compile coffeescript modules to javascript only
     -C            do not compile coffeescript to javascript.
@@ -104,6 +104,10 @@ ccbaker [arguments] <path to root module>
     -w  [path]    output baked file to [path] and keep watching all reachable
                   paths for changes, recreating baked file as they change
     -v            print extra information to the terminal on stderr
+```
+Bake the modules reachable from two files and minify the output:
+```shell
+$ ccbaker -m primary.js secondary > output.min.js
 ```
 
 using unbaked modules
@@ -115,7 +119,7 @@ To use from html without baking:
     cc.libpath = 'lib'; // URL to the folder containing all your modules.
                         // lib is the default.
 
-    // assumes your root module is at "lib/root/master.js". This will in turn load
+    // assumes your module is at "lib/root/master.js". This will in turn load
     // all dependency modules and you will be able to debug them with their full
     // file paths.
     cc.require("root.master");
