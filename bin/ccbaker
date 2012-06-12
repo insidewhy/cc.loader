@@ -2,6 +2,6 @@
 
 path = require 'path'
 
-require(path.join __dirname, '../lib/commoncommon/baker').run process.argv
+require(path.join __dirname, '../lib/ccloader/baker').run process.argv
 
 # vi:filetype=coffee

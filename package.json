@@ -1,5 +1,5 @@
 {
-    "name":    "commoncommon",
+    "name":    "ccloader",
     "description": "A javascript module loading/creation system for the web including support for baking. Written in coffeescript.",
     "author": {
         "name": "James Pike",
@@ -25,10 +25,10 @@
       "node": ">=0.4.0"
     },
     "scripts": {
-        "install": "./node_modules/coffee-script/bin/coffee -p lib/commoncommon/web.coffee > cc.js"
+        "install": "./node_modules/coffee-script/bin/coffee -p lib/ccloader/web.coffee > cc.js"
     },
     "directories": {
-        "lib": "./lib/commoncommon"
+        "lib": "./lib/ccloader"
     },
     "bin": {
         "ccbaker": "./bin/ccbaker"

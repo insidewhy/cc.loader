@@ -1,5 +1,5 @@
-commoncommon
-============
+ccloader
+========
 
 A javascript module loading/creation system for the web including support for baking. Written in coffeescript but supports javascript and coffeescript modules and compiles/bakes all coffeescript to javascript.
 
@@ -8,7 +8,7 @@ installation
 
 To install globally:
 
-    sudo npm install -g commoncommon
+    sudo npm install -g ccloader
 
 usage
 =====
@@ -22,7 +22,7 @@ cc.module('root')
 ```
 defines runs after the required modules have loaded.
 
-Each commoncommon module file must define a module name corresponding to its path otherwise the module  will fail to load (but with a helpful error message). For example "other.submodule" must be defined in "other/submodule.js" or "other/submodule.coffee". A configurable prefix which defaults to "lib" can also be prepended to the script path. Conversely when requiring a module as a dependency the filesystem path to load it from is determined from the module path.
+Each ccloader module file must define a module name corresponding to its path otherwise the module  will fail to load (but with a helpful error message). For example "other.submodule" must be defined in "other/submodule.js" or "other/submodule.coffee". A configurable prefix which defaults to "lib" can also be prepended to the script path. Conversely when requiring a module as a dependency the filesystem path to load it from is determined from the module path.
 
 examples
 --------
@@ -82,7 +82,7 @@ You can put multiple modules in a single file but only things defined by the mod
 
 baking
 ------
-When using cc.require or &lt;script&gt; in a head of a javascript, many web conections are created in order to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing commoncommon provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) javascript file which can be loaded very fast by the browser.
+When using cc.require or &lt;script&gt; in a head of a javascript, many web conections are created in order to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing ccloader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) javascript file which can be loaded very fast by the browser.
 
 To bake the module above together with its dependencies:
 
@@ -147,3 +147,7 @@ dependencies
 ============
  * baker: node.js, npm will fetch other node module dependencies for you.
  * web: nothing to use the library or a baked library.
+
+Why ccloader
+============
+I like [C.C. Lemon](http://en.wikipedia.org/wiki/C.C._Lemon)
