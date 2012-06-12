@@ -70,7 +70,9 @@ usage = () ->
     ccbaker [arguments] <path to root module>
       arguments:
         -c            compile coffeescript modules to javascript only
+        -C            do not compile coffeescript to javascript.
         -m            minify javascript
+        -o            obfuscate javascript
         -w  [path]    output baked file to [path] and keep watching all reachable
                       paths for changes, recreating baked file as they change
         -v            print extra information to the terminal on stderr"""
