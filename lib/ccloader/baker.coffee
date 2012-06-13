@@ -75,7 +75,7 @@ usage = () ->
     ccbaker [arguments] <paths to source files>
       arguments:
         -c            compile coffeescript modules to javascript only
-        -C            do not compile coffeescript to javascript.
+        -C            do not compile coffeescript to javascript
         -m            minify javascript
         -o            obfuscate javascript
         -w  [path]    output baked file to [path] and keep watching all reachable
