@@ -2,9 +2,11 @@
 Makefile.local
 /node_modules
 /test/web/cc.js
-/test/web/friend.js
-/test/web/jconsole.js
-/test/web/incmissing.js
-/test/web/pet/cat.js
-/test/web/pet/dog.js
+/test/web/lib/friend.js
+/test/web/lib/jconsole.js
+/test/web/lib/incmissing.js
+/test/web/lib/pet/cat.js
+/test/web/lib/pet/dog.js
+/test/web/joose.js
+/test/web/joose-2.1.js
 /cc.js
