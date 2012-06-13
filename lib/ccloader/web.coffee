@@ -1,3 +1,11 @@
+class Self
+  constructor: (@__ccModName) ->
+  _getName: (name) -> "#{@__ccModName}.#{name}"
+  class: (name, val) ->
+    cc.class @_getName(name), val
+  set: (name, val) ->
+    cc.set @_getName(name), val
+
 class Module
   constructor: (@name) ->
     @status = 'loading'
@@ -36,7 +44,7 @@ class Module
   _define: ->
     # console.log "define #{@name}"
     @status = 'loaded'
-    self = {}
+    self = new Self @name
 
     try
       @defineCallback self
@@ -46,7 +54,7 @@ class Module
       onload @name for onload in @onloads
 
     hasKey = () ->
-      for own key of self
+      for own key of self when key isnt '__ccModName'
         return true
       false
 
