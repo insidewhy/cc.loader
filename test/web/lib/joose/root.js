@@ -1,5 +1,5 @@
-cc.module('joose.root').requires('joose.enemy').defines (function(self) {
-  // Using cc.class to set any global joose class.
+cc.module('joose.root').requires('joose.Enemy').defines (function(self) {
+  // Use self.class to create a class inside of the module namespace.
   self.class('Friend', {
     methods: {
       greet: function() { jconsole.log("friendly greets"); }
@@ -12,7 +12,7 @@ cc.module('joose.root').requires('joose.enemy').defines (function(self) {
   });
 
   var friend = new joose.root.Friend(),
-      enemy  = new joose.enemy.Enemy();
+      enemy  = new joose.Enemy();
 
   friend.greet();
   enemy.greet();

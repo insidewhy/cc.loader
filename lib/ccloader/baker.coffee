@@ -52,11 +52,13 @@ class Module
       packModule lib
     this
 
-  defines: () ->
+  defines: ->
     @status = 'packed'
     verbose "packed #{@name}"
     moduleOrder.push this
     this
+
+  class: -> do @defines
 
   jooseClass: -> do @defines
 

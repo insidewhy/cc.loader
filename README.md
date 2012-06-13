@@ -1,7 +1,7 @@
 ccloader
 ========
 
-A JavaScript module loading/creation system for the web including support for baking. ccloader is written in CoffeeScript but supports JavaScript and CoffeeScript modules and compiles/bakes all CoffeeScript to JavaScript. It includes support for asynchronously loading modules and their dependencies from URL paths using a simple but powerful JavaScript API. It can optionally integrate with [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) to ease adding classes to modules.
+A JavaScript module loading/creation system for the web including support for baking. It includes support for asynchronously loading modules and their dependencies from multiple script files using a simple but powerful JavaScript API. It can optionally integrate with [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) to ease adding classes to modules or creating module files that are classes. ccloader is written in CoffeeScript but supports JavaScript and CoffeeScript modules and compiles/bakes all CoffeeScript to JavaScript. 
 
 installation
 ============
@@ -40,20 +40,28 @@ cc.module('friend.root').defines(function() {
 
   // friend.* now available to this module and the `defines' callbacks
   // of all including modules.
-  var favourite = friend.root.favourite;
-      catSays   = friend.Root.SayingsOf.cat,
+  var favourite = friend.root.favourite,
+      catSays   = friend.Root.SayingsOf.cat;
 });
 ```
 
 modules and namespaces
 ----------------------
-Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them. The author of this library believes that this is the most sensible way to structure modules.
+Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them. Personally I believe that this is the most sensible way to structure modules.
 
 The first argument passed to the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
 ```javascript
 cc.module('pet.cat').defines(function(self) {
   // This makes pet.cat.style available to all modules that require pet.cat
-  self.style = "sleepy";
+  // Equivalent to: cc.set('pet.cat.style', 'sleepy');
+  self.style = 'sleepy';
+
+  // Equivalent to self.sound = 'meow'.
+  self.set('sound', 'meow');
+
+  // Also works:
+  self.set('friend.dog',   false);
+  self.set('friend.human', true);
 
   // The "pet.cat" namespace will only be created if the self object
   // contains at least one key, otherwise other mechanisms like cc.set can
@@ -119,6 +127,35 @@ cc.module('joose.root').defines (function(self) {
 
   var friend = new joose.root.Friend();
   friend.greet();
+})
+```
+
+A module itself can be a Joose class. The following two files show how to create and use such a class:
+```javascript
+// file: lib/root/Enemy.js
+cc.module('root.Enemy').class({
+  // The module is the Joose class. I start these files with a capital letter
+  // but it isn't mandatory.
+  methods: {
+    greet: function() { console.log("angry greets"); }
+  }
+})
+```
+
+```javascript
+// file: lib/root.js
+cc.module('root').requires('root.Enemy').defines (function(self) {
+  self.class('Friend', {
+    methods: {
+      greet: function() { console.log("friendly greets"); }
+    }
+  });
+
+  var friend = new root.Friend(),
+      enemy  = new root.Enemy();
+
+  friend.greet();
+  enemy.greet();
 })
 ```
 

@@ -20,10 +20,11 @@ class Module
     @onloads.push callback
     this
 
-  defines: (@defineCallback) ->
-    do @_loadModuleScript
+  class: (classContent) ->
+    @defines ->
+      cc.class @name, classContent
 
-  _loadModuleScript: ->
+  defines: (@defineCallback) ->
     if not @deps
       do @_define
     else
