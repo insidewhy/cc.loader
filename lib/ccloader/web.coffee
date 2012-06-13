@@ -35,7 +35,7 @@ class Module
 
   _define: ->
     # console.log "define #{@name}"
-    @status = 'defined'
+    @status = 'loaded'
     self = {}
 
     try
@@ -55,6 +55,7 @@ class Module
 
     do onload for onload in @onloads
     delete @onloads
+    @status = 'defined'
     return
 
 class CC
@@ -83,10 +84,11 @@ class CC
       # externally referenced via "cc.requires".
       return cc.modules[name] = new Module name
 
-  # set a value at a particular namespace under @global
-  # e.g. ns = "hey.baby", val = "1"
-  #   -> hey.baby = 1
-  set: (ns, val) ->
+  # set path to
+  # given "grandparent.parent.element"
+  #    creates: cc.grandparent = { parent = {} }
+  #    returns: [ cc.grandparent.parent, element ]
+  namespaceFor: (ns) ->
     obj = @global
     components = ns.split '.'
     for space in components[0...(components.length - 1)]
@@ -98,9 +100,17 @@ class CC
       else
         alert "namespace conflict, #{ns} = #{current} of #{typeof current}"
 
-    lastComp = components[components.length - 1]
+    [ obj, components[components.length - 1] ]
+
+  # set a value at a particular namespace under @global
+  # e.g. ns = "hey.baby", val = "1"
+  #   -> hey.baby = 1
+  set: (ns, val) ->
+    # console.log "cc.set #{ns} = #{val}"
+    [ obj, lastComp ] = @namespaceFor ns
     current = obj[lastComp]
     if current
+      # if existing and current are both objects then merge them
       if typeof current == 'object' and typeof val == 'object'
         for own key, subval of val
           current[key] = subval
@@ -108,6 +118,12 @@ class CC
         alert "namespace conflict, #{ns} = #{current} of #{typeof current}"
     else
       obj[lastComp] = val
+
+  class: (ns, clss) ->
+    if not Class?
+      throw 'please install Joose to use cc.class'
+    @namespaceFor ns
+    Class ns, clss
 
   scriptOnload: (script, onload) ->
     if script.readyState
@@ -159,7 +175,7 @@ class CC
         if 'failed' == mod.status
           # console.log "require #{name} failed"
           callback name
-        else if 'loading' == mod.status
+        else if 'defined' != mod.status
           # console.log "require #{name} is loading"
           mod.pushOnload callback
         else
