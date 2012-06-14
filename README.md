@@ -35,11 +35,11 @@ cc.module('friend.root').defines(function() {
   // most modules and/or projects.
   cc.set('friend.root.favourite', 'cat');
 
-  // You can populate any namespace from a module.
-  cc.set('friend.Root.SayingsOf', { cat: 'meow', dog: 'woof' });
+  // You can populate any namespace from a module if you want.
+  cc.set('friendly.Root.SayingsOf', { cat: 'meow', dog: 'woof' });
 
-  // friend.* now available to this module and the `defines' callbacks
-  // of all including modules.
+  // The namespace elements defined in this module will be available to the
+  // `defines' callbacks of all including modules.
   var favourite = friend.root.favourite,
       catSays   = friend.Root.SayingsOf.cat;
 });
@@ -59,7 +59,7 @@ cc.module('pet.cat').defines(function(self) {
   // Equivalent to self.sound = 'meow'.
   self.set('sound', 'meow');
 
-  // Also works:
+  // Also works to set pet.cat.friend.(dog/human):
   self.set('friend.dog',   false);
   self.set('friend.human', true);
 
@@ -165,15 +165,15 @@ When using cc.require or &lt;script&gt; tags one web request is made to load eac
 
 To bake the module above together with its dependencies:
 
-```shell
-$ ccbaker root.js > output.js
+```
+% ccbaker root.js > output.js
 ```
 
 The root directory is determined from the name of the module in the first source file passed and where it sits in the filesystem tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but a module named "baker" at lib/hello/baker.js would set the root as "lib/hello".
 
 Full arguments:
-```shell
-$ ccbaker -h
+```
+% ccbaker -h
 ccbaker [arguments] <paths to source files>
   arguments:
     -c            compile CoffeeScript modules to JavaScript only
@@ -185,24 +185,35 @@ ccbaker [arguments] <paths to source files>
     -v            print extra information to the terminal on stderr
 ```
 Bake the modules reachable from two files and minify the output:
-```shell
-$ ccbaker -m primary.js secondary > output.min.js
+```
+% ccbaker -m primary.js secondary > output.min.js
 ```
 
 notes on development
 --------------------
-IE makes it impossible to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module structure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
+IE makes it very difficult to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module structure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
 
 The poll timeout can be set with the following code and should be set before requiring the first module:
-
 ```javascript
 cc.ieScriptPollTimeout = 5000; // in milliseconds, 5000 is the default
 ```
+The reason every file requires a module corresponding to the filename is to support IE 8 and below.
 
 dependencies
 ============
  * baker: node.js, npm will fetch other node module dependencies for you.
  * web: nothing to use the library or a baked library. If Joose is loaded then a small amount of extra API is available.
+
+testing
+=======
+```
+% git clone git://github.com/nuisanceofcats/ccloader.git
+% cd ccloader
+% make test
+make[1]: Entering directory `/home/james/projects/ccloader/test'
+ccloader test server listening on: 8012
+please go to http://localhost:8012/
+```
 
 FAQ
 ===
