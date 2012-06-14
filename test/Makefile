@@ -19,5 +19,5 @@ web/joose.js:
 web/joose-2.1.js:
 	wget http://joose-js.googlecode.com/files/joose.mini.js -O $@
 
-web/lib/packed.js: ./web/lib/root.js
+web/lib/packed.js: ./web/lib/root.js ./web/lib/joose/root.js
 	../bin/ccbaker -v $^ > $@

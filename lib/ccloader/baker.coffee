@@ -2,10 +2,13 @@ console = require 'console'
 path = require 'path'
 
 libdir = null # full path to root of library tree
-rootModulePath = null # directory containing root module
 modules = {}
-moduleOrder = [] # modules ordered with dependencies first
+fileOrder = [] # modules ordered with dependencies first
 options = {} # options based on command line arguments
+
+currArgFile = null # current file from argv being processed
+currFileMods = [] # modules in current file being processed
+fileFromArgv = true # current argv module being parsed
 
 verbose = (tolog...) ->
   return unless options.verbose
@@ -19,56 +22,92 @@ packModule = (modName) ->
   mod = modules[modName]
   if not mod
     mod = modules[modName] = new Module modName
-  else if mod.status == 'packed'
+  else if mod.status is 'packed'
     verbose "already packed #{modName}"
     return
-  else if mod.status == 'packing'
+  else
     # TODO: output cycle
     throw "cyclic dependency to #{modName}"
 
   pathbase = moduleToPath modName
   verbose "packing #{modName} at #{pathbase}"
 
-  require pathbase
+  requireModule pathbase
+  if mod.status isnt 'packed'
+    throw "file #{currArgFile} does not contain a module named #{modName}"
+
+  return
 
 class Module
   constructor: (@name) ->
     @status = 'packing'
+    currFileMods.push this
 
   requires: (libs...) ->
-    if not libdir
-      libdir = path.join process.cwd(), rootModulePath
-      idx = @name.indexOf '.'
-      while -1 != idx
-        console.log "#{libdir} to #{path.dirname libdir}"
-        libdir = path.dirname libdir
-        idx = @name.indexOf '.', idx
-      verbose "got libdir #{libdir}"
-
-      # determine from current path
-
     verbose "module #{@name} requires #{libs}"
-    for lib in libs
-      packModule lib
+    @libs = libs
     this
 
-  defines: ->
-    @status = 'packed'
+  defines: -> {}
+  empty: -> {}
+  class: -> {}
+  jooseClass: -> {}
+
+  defineRequirements: ->
+    if @libs
+      packModule lib for lib in @libs
+    this
+
+  define: ->
     verbose "packed #{@name}"
-    moduleOrder.push this
+    fileOrder.push this if @status is 'packing'
+    @status = 'packed'
     this
 
-  class: -> do @defines
+requireModule = (path) ->
+  require path
 
-  jooseClass: -> do @defines
+  pathMods = currFileMods
+  currFileMods = []
+
+  do mod.defineRequirements for mod in pathMods
+  do mod.define for mod in pathMods
+  return
 
 class CC
   module: (name) ->
     module = modules[name]
     if not module
-      modules[name] = new Module name
-    else
-      module
+      module = modules[name] = new Module name
+      if fileFromArgv
+        # then it is a file passed from argv
+        # make sure module name components match path, if they don't then
+        # assume it's a secondary file module
+        _libdir = path.join process.cwd(), path.dirname currArgFile
+        comps = name.split '.'
+        lastComp = do comps.pop
+
+        if lastComp isnt path.basename(currArgFile).replace /\..*$/,''
+          module.status = 'withoutfile'
+          return module
+
+        while comps.length
+          verbose "#{_libdir} to #{path.dirname _libdir}"
+          if comps.pop() isnt path.basename _libdir
+            module.status = 'withoutfile'
+            return module
+          _libdir = path.dirname _libdir
+
+        if not libdir
+          libdir = _libdir
+          verbose "determined libdir #{libdir}"
+        else if libdir isnt _libdir
+          throw "module #{name} at libdir #{_libdir} which differs from #{libdir}"
+
+        fileFromArgv = false
+      else
+        module.status = 'withoutfile'
+    module
 
 global.cc = new CC
 
@@ -112,20 +151,22 @@ exports.run = (argv) ->
 
   verbose "options:", JSON.stringify options
 
-  filePath = argv[argvIdx]
-  if not filePath
+  if not argv[argvIdx]
     console.warn "must supply at least one file"
     do usage
     return
 
-  rootModulePath = path.dirname filePath
-  require path.join process.cwd(), filePath
-
-  ++argvIdx
   while argv[argvIdx]
-    require path.join process.cwd(), argv[argvIdx]
+    fileFromArgv = true
+    currArgFile = argv[argvIdx]
+    requireModule path.join process.cwd(), currArgFile
+    if fileFromArgv
+      console.warn "file #{currArgFile} does not contain an appropriately named module"
+      return
     ++argvIdx
 
-  verbose "modules:", [ mod.name for mod in moduleOrder ]
+  verbose "modules:", [ mod.name for mod in fileOrder ]
+  # for mod in fileOrder
+  #   console.warn "poo #{mod.name}"
 
 # vim:ts=2 sw=2
