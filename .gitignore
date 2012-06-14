@@ -7,6 +7,7 @@ Makefile.local
 /test/web/lib/incmissing.js
 /test/web/lib/pet/cat.js
 /test/web/lib/pet/dog.js
+/test/web/lib/packed.js
 /test/web/joose.js
 /test/web/joose-2.1.js
 /cc.js

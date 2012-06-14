@@ -45,6 +45,13 @@ class Module
         cc.require dep, onLoad
     this
 
+  # define an empty module
+  empty: ->
+    do onload for onload in @onloads
+    delete @onloads
+    @status = 'defined'
+    return
+
   _define: ->
     # console.log "define #{@name}"
     @status = 'loaded'
@@ -62,13 +69,8 @@ class Module
         return true
       false
 
-    if hasKey()
-      cc.set @name, self
-
-    do onload for onload in @onloads
-    delete @onloads
-    @status = 'defined'
-    return
+    cc.set @name, self if hasKey()
+    do @empty # from here on out these functions are the same
 
 class CC
   constructor: ->

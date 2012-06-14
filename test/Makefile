@@ -2,11 +2,10 @@
 
 coffee = ../node_modules/coffee-script/bin/coffee
 
-build: web/cc.js web/joose.js
+build: web/cc.js web/joose.js web/lib/packed.js
 	@${coffee} >/dev/null -c web
 
-bake-test:
-	../bin/ccbaker -v ./web/lib/{,joose/}root.js
+bake-test: web/lib/packed.js
 
 serve: build
 	@${coffee} serve.coffee web
@@ -19,3 +18,6 @@ web/joose.js:
 
 web/joose-2.1.js:
 	wget http://joose-js.googlecode.com/files/joose.mini.js -O $@
+
+web/lib/packed.js: ./web/lib/root.js
+	../bin/ccbaker -v $^ > $@

@@ -159,6 +159,14 @@ cc.module('root').requires('root.Enemy').defines (function(self) {
 })
 ```
 
+empty modules
+-------------
+A module doesn't have to have a "defines" call but if not it must call "empty". This can be useful for creating modules that serve only to bundle other modules together:
+
+```javascript
+cc.module('util').requires('util.file', 'util.path').empty();
+```
+
 baking
 ======
 When using cc.require or &lt;script&gt; tags one web request is made to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing ccloader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) JavaScript file which can be loaded quickly.
