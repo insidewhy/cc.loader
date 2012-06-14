@@ -3,8 +3,10 @@ class Self
   _getName: (name) -> "#{@__ccModName}.#{name}"
   class: (name, val) ->
     cc.class @_getName(name), val
+    this
   set: (name, val) ->
     cc.set @_getName(name), val
+    this
 
 class Module
   constructor: (@name) ->
@@ -23,6 +25,7 @@ class Module
   class: (classContent) ->
     @defines ->
       cc.class @name, classContent
+    this
 
   defines: (@defineCallback) ->
     if not @deps
@@ -93,9 +96,8 @@ class CC
       # externally referenced via "cc.requires".
       return cc.modules[name] = new Module name
 
-  # set path to
   # given "grandparent.parent.element"
-  #    creates: cc.grandparent = { parent = {} }
+  #    creates: cc.global.grandparent = { parent = {} }
   #    returns: [ cc.grandparent.parent, element ]
   namespaceFor: (ns) ->
     obj = @global
@@ -114,6 +116,9 @@ class CC
   # set a value at a particular namespace under @global
   # e.g. ns = "hey.baby", val = "1"
   #   -> hey.baby = 1
+  # If the namespace already exists then this call will throw an exception
+  # unless the target and source are both objects, in which case the target
+  # keys are merged into the source object.
   set: (ns, val) ->
     # console.log "cc.set #{ns} = #{val}"
     [ obj, lastComp ] = @namespaceFor ns
@@ -127,12 +132,14 @@ class CC
         alert "namespace conflict, #{ns} = #{current} of #{typeof current}"
     else
       obj[lastComp] = val
+    this
 
   class: (ns, clss) ->
     if not Class?
       throw 'please install Joose to use cc.class'
     @namespaceFor ns
     Class ns, clss
+    this
 
   scriptOnload: (script, onload) ->
     if script.readyState
@@ -144,7 +151,7 @@ class CC
             script.onreadystatechange = null
     else
       script.onload = onload
-    return
+    this
 
   # loads a script into the head of the browser and call success/error callbacks
   loadScript: (path, onload, onerror) ->
@@ -171,6 +178,7 @@ class CC
     script.src = path
     @head.appendChild script
     script
+    this
 
 
   # require module name, with optional callback on success.
