@@ -6,10 +6,9 @@
         "email": "npm@chilon.net",
         "web": "http://chilon.net"
     },
-    "version": "0.1.0",
+    "version": "0.9.0",
     "dependencies": {
-        "coffee-script": "1.3.3",
-        "underscore":    "1.3.3"
+        "coffee-script": "1.3.3"
     },
     "devDependencies": {
         "jasmine-node":  "1.0.26",
@@ -25,7 +24,7 @@
       "node": ">=0.4.0"
     },
     "scripts": {
-        "install": "./node_modules/coffee-script/bin/coffee -p lib/ccloader/web.coffee > cc.js"
+        "install": "coffee -p lib/ccloader/web.coffee > cc.js"
     },
     "directories": {
         "lib": "./lib/ccloader"

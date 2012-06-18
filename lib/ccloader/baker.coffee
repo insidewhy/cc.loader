@@ -1,14 +1,18 @@
 console = require 'console'
 path = require 'path'
+fs = require 'fs'
+coffee = require 'coffee-script'
 
 libdir = null # full path to root of library tree
 modules = {}
 fileOrder = [] # modules ordered with dependencies first
 options = {} # options based on command line arguments
 
+currFilePath = null # path of current file being required
 currArgFile = null # current file from argv being processed
 currFileMods = [] # modules in current file being processed
-fileFromArgv = true # current argv module being parsed
+fileModuleRequired = true
+# true when the module with the name of the current file is required
 
 verbose = (tolog...) ->
   return unless options.verbose
@@ -65,6 +69,7 @@ class Module
     this
 
 requireModule = (path) ->
+  currFilePath = path
   require path
 
   pathMods = currFileMods
@@ -79,7 +84,10 @@ class CC
     module = modules[name]
     if not module
       module = modules[name] = new Module name
-      if fileFromArgv
+      module.path = currFilePath
+      if not fileModuleRequired
+        module.status = 'withoutfile'
+      else
         # then it is a file passed from argv
         # make sure module name components match path, if they don't then
         # assume it's a secondary file module
@@ -104,9 +112,8 @@ class CC
         else if libdir isnt _libdir
           throw "module #{name} at libdir #{_libdir} which differs from #{libdir}"
 
-        fileFromArgv = false
-      else
-        module.status = 'withoutfile'
+        fileModuleRequired = false
+    module.path = currFilePath
     module
 
 global.cc = new CC
@@ -157,15 +164,31 @@ exports.run = (argv) ->
     return
 
   while argv[argvIdx]
-    fileFromArgv = true
+    fileModuleRequired = true
     currArgFile = argv[argvIdx]
     requireModule path.join process.cwd(), currArgFile
-    if fileFromArgv
+    if fileModuleRequired
       console.warn "file #{currArgFile} does not contain an appropriately named module"
       return
     ++argvIdx
 
   verbose "modules:", [ mod.name for mod in fileOrder ]
+  outputJs = (path) ->
+    console.log fs.readFileSync(path).toString()
+
+  outputCoffee = (path) ->
+    console.log coffee.compile(fs.readFileSync(path).toString())
+
+  outputJs path.join path.dirname(path.dirname __dirname), 'cc.js'
+
+  for mod in fileOrder
+    if mod.path.match(/\.js$/)
+      outputJs mod.path
+    else if path.existsSync "#{mod.path}.js"
+      outputJs "#{mod.path}.js"
+    else
+      outputCoffee "#{mod.path}.coffee"
+  return
   # for mod in fileOrder
   #   console.warn "poo #{mod.name}"
 
