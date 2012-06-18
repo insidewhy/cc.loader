@@ -182,8 +182,8 @@ exports.run = (argv) ->
     targetCode = uglifier.gen_code ast
     newLen = targetCode.length
     if verbose
-      console.warn "old code length: #{oldLen}, after minifying: #{newLen}, saved #{oldLen - newLen}"
-
+      console.warn "old code length: #{oldLen}, after minifying: #{newLen} " +
+                   "saved #{oldLen - newLen}"
 
   console.log targetCode
 

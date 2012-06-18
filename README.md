@@ -47,7 +47,7 @@ cc.module('friend.root').defines(function() {
 
 modules and namespaces
 ----------------------
-Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them. Personally I believe that this is the most sensible way to structure modules.
+Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them.
 
 The first argument passed to the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
 ```javascript
@@ -130,7 +130,7 @@ cc.module('joose.root').defines (function(self) {
 })
 ```
 
-A module itself can be a Joose class. The following two files show how to create and use such a class:
+A module itself can be a Joose class:
 ```javascript
 // file: lib/root/Enemy.js
 cc.module('root.Enemy').class({
@@ -140,6 +140,25 @@ cc.module('root.Enemy').class({
     greet: function() { console.log("angry greets"); }
   }
 })
+```
+
+An alternative way of making a module that is a Joose class:
+```javascript
+// file: lib/root/Boss.js
+cc.module('joose.Boss').requires('joose.Enemy').defines(function(self) {
+  // uses self.class as it must be postponed until after joose.Enemy has loaded
+  // in order for the inheritance to work.
+  self.class({
+    isa: joose.Enemy,
+    override: {
+      attack: function() {
+        console.log("throw hammer");
+        this.SUPER();
+        console.log("breath fire");
+      }
+    }
+  });
+});
 ```
 
 ```javascript
@@ -152,10 +171,12 @@ cc.module('root').requires('root.Enemy').defines (function(self) {
   });
 
   var friend = new root.Friend(),
-      enemy  = new root.Enemy();
+      enemy  = new root.Enemy(),
+      boss   = new joose.Boss();
 
   friend.greet();
   enemy.greet();
+  boss.attack();
 })
 ```
 

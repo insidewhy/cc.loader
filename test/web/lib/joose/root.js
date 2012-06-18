@@ -1,4 +1,4 @@
-cc.module('joose.root').requires('joose.Enemy').defines (function(self) {
+cc.module('joose.root').requires('joose.Enemy', 'joose.Boss').defines (function(self) {
   // Use self.class to create a class inside of the module namespace.
   self.class('Friend', {
     methods: {
@@ -12,9 +12,11 @@ cc.module('joose.root').requires('joose.Enemy').defines (function(self) {
   });
 
   var friend = new joose.root.Friend(),
-      enemy  = new joose.Enemy();
+      enemy  = new joose.Enemy(),
+      boss   = new joose.Boss();
 
   friend.greet();
   enemy.greet();
-})
+  boss.attack();
+});
 // vim:ts=2 sw=2

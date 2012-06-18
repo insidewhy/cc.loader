@@ -2,7 +2,10 @@ class Self
   constructor: (@__ccModName) ->
   _getName: (name) -> "#{@__ccModName}.#{name}"
   class: (name, val) ->
-    cc.class @_getName(name), val
+    if val
+      cc.class @_getName(name), val
+    else
+      cc.class @__ccModName, name
     this
   set: (name, val) ->
     cc.set @_getName(name), val
