@@ -3,7 +3,6 @@
 coffee = ../node_modules/coffee-script/bin/coffee
 
 build: web/cc.js web/joose.js web/lib/packed.js
-	@${coffee} >/dev/null -c web
 
 bake-test: web/lib/packed.js
 

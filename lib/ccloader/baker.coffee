@@ -2,10 +2,12 @@ console = require 'console'
 path = require 'path'
 fs = require 'fs'
 coffee = require 'coffee-script'
+uglParser = require("uglify-js").parser
+uglifier = require("uglify-js").uglify
 
 libdir = null # full path to root of library tree
 modules = {}
-fileOrder = [] # modules ordered with dependencies first
+modulesInDepOrder = [] # modules ordered with dependencies first
 options = {} # options based on command line arguments
 
 currFilePath = null # path of current file being required
@@ -64,7 +66,7 @@ class Module
 
   define: ->
     verbose "packed #{@name}"
-    fileOrder.push this if @status is 'packing'
+    modulesInDepOrder.push this if @status is 'packing'
     @status = 'packed'
     this
 
@@ -124,7 +126,7 @@ usage = () ->
       arguments:
         -c            compile coffeescript modules to javascript only
         -C            do not compile coffeescript to javascript
-        -m            minify javascript
+        -m            do not minify javascript
         -o            obfuscate javascript
         -w  [path]    output baked file to [path] and keep watching all reachable
                       paths for changes, recreating baked file as they change
@@ -143,15 +145,13 @@ exports.run = (argv) ->
       when '-C'
         options.doNotCompileCoffee = true
       when '-m'
-        options.minify = true
+        options.doNotMinify = true
       when '-v'
         options.verbose = true
-      when '-o'
-        options.obfuscate = true
       when '-h'
         do usage
         return
-      when '-w'
+      when '-w', '-o'
         console.warn "sorry, #{argv[argvIdx]} is not yet supported"
         return
     ++argvIdx
@@ -172,24 +172,46 @@ exports.run = (argv) ->
       return
     ++argvIdx
 
-  verbose "modules:", [ mod.name for mod in fileOrder ]
-  outputJs = (path) ->
-    console.log fs.readFileSync(path).toString()
+  verbose "modules:", [ mod.name for mod in modulesInDepOrder ]
+  targetCode = modulesToSource(modulesInDepOrder)
+  unless options.doNotMinify
+    ast = uglParser.parse targetCode
+    ast = uglifier.ast_mangle ast
+    ast = uglifier.ast_squeeze ast
+    oldLen = targetCode.length
+    targetCode = uglifier.gen_code ast
+    newLen = targetCode.length
+    if verbose
+      console.warn "old code length: #{oldLen}, after minifying: #{newLen}, saved #{oldLen - newLen}"
 
-  outputCoffee = (path) ->
-    console.log coffee.compile(fs.readFileSync(path).toString())
+
+  console.log targetCode
+
+# outputs modules in order given
+modulesToSource = (modules) ->
+  targetCode = ''
+
+  outputJs = (path) ->
+    targetCode += fs.readFileSync(path).toString() unless options.compileCoffeOnly
+
+  outputCoffee = (root) ->
+    jsCode = coffee.compile(fs.readFileSync("#{root}.coffee").toString())
+    targetCode += jsCode unless options.compileCoffeOnly
+    unless options.doNotCompileCoffee
+      fs.writeFileSync("#{root}.js", jsCode)
 
   outputJs path.join path.dirname(path.dirname __dirname), 'cc.js'
 
-  for mod in fileOrder
+  for mod in modules
     if mod.path.match(/\.js$/)
       outputJs mod.path
-    else if path.existsSync "#{mod.path}.js"
-      outputJs "#{mod.path}.js"
+    else if mod.path.match(/\.coffee$/)
+      outputJs mod.path.replace /\.coffee$/, ''
+    else if path.existsSync "#{mod.path}.coffee"
+      outputCoffee mod.path
     else
-      outputCoffee "#{mod.path}.coffee"
-  return
-  # for mod in fileOrder
-  #   console.warn "poo #{mod.name}"
+      outputJs "#{mod.path}.js"
+
+  targetCode
 
 # vim:ts=2 sw=2
