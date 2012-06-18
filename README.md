@@ -192,10 +192,9 @@ baking
 ======
 When using cc.require or &lt;script&gt; tags one web request is made to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing ccloader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) JavaScript file which can be loaded quickly.
 
-To bake the module above together with its dependencies:
-
+To bake a module together with its dependencies and minify the output:
 ```
-% ccbaker root.js > output.js
+% ccbaker module.js > output.js
 ```
 
 The root directory is determined from the name of the module in the first source file passed and where it sits in the filesystem tree. "hello.baker" at lib/hello/baker.js would set the root to "lib" but a module named "baker" at lib/hello/baker.js would set the root as "lib/hello".
@@ -209,13 +208,15 @@ ccbaker [arguments] <paths to source files>
     -C            do not compile CoffeeScript to JavaScript
     -m            do not minify JavaScript
     -o            obfuscate JavaScript
+    -s            use strict mode for packed file
     -w  [path]    output baked file to [path] and keep watching all reachable
                   paths for changes, recreating baked file as they change
     -v            print extra information to the terminal on stderr
 ```
-Bake the modules reachable from two files and minify the output:
+
+e.g. Bake the modules reachable from two files without minifying the output:
 ```
-% ccbaker -m primary.js secondary > output.min.js
+% ccbaker -m primary.js secondary.coffee > output.min.js
 ```
 
 notes on development

@@ -128,6 +128,7 @@ usage = () ->
         -C            do not compile coffeescript to javascript
         -m            do not minify javascript
         -o            obfuscate javascript
+        -s            use strict mode for packed file
         -w  [path]    output baked file to [path] and keep watching all reachable
                       paths for changes, recreating baked file as they change
         -v            print extra information to the terminal on stderr"""
@@ -144,6 +145,8 @@ exports.run = (argv) ->
         options.compileCoffeOnly = true
       when '-C'
         options.doNotCompileCoffee = true
+      when '-s'
+        options.useStrict = true
       when '-m'
         options.doNotMinify = true
       when '-v'
@@ -153,6 +156,9 @@ exports.run = (argv) ->
         return
       when '-w', '-o'
         console.warn "sorry, #{argv[argvIdx]} is not yet supported"
+        return
+      else
+        console.warn "unknown argument: #{argv[argvIdx]}"
         return
     ++argvIdx
 
@@ -185,6 +191,7 @@ exports.run = (argv) ->
       console.warn "old code length: #{oldLen}, after minifying: #{newLen} " +
                    "saved #{oldLen - newLen}"
 
+  console.log '"use strict";' if options.useStrict
   console.log targetCode
 
 # outputs modules in order given
@@ -206,7 +213,7 @@ modulesToSource = (modules) ->
     if mod.path.match(/\.js$/)
       outputJs mod.path
     else if mod.path.match(/\.coffee$/)
-      outputJs mod.path.replace /\.coffee$/, ''
+      outputCoffee mod.path.replace /\.coffee$/, ''
     else if path.existsSync "#{mod.path}.coffee"
       outputCoffee mod.path
     else
