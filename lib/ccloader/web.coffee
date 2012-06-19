@@ -1,11 +1,12 @@
 class Self
-  constructor: (@__ccModName) ->
-  _getName: (name) -> "#{@__ccModName}.#{name}"
+  constructor: (ccModName) ->
+    this.__cc = modName: ccModName
+  _getName: (name) -> "#{@__cc.modName}.#{name}"
   class: (name, val) ->
     if val
       cc.class @_getName(name), val
     else
-      cc.class @__ccModName, name
+      cc.class @__cc.modName, name
     this
   set: (name, val) ->
     cc.set @_getName(name), val
@@ -15,9 +16,15 @@ class Module
   constructor: (@name) ->
     @status = 'loading'
     @onloads = []
+    @deps = []
 
   requires: (libs...) ->
-    @deps = libs
+    @deps.push lib for lib in libs
+    this
+
+  parent: (lib) ->
+    @_parent = lib
+    @deps.push lib
     this
 
   pushOnload: (callback) ->
@@ -26,12 +33,14 @@ class Module
     this
 
   class: (classContent) ->
-    @defines ->
+    @defines =>
+      if @_parent
+        classContent.isa = cc.get @_parent
       cc.class @name, classContent
     this
 
   defines: (@defineCallback) ->
-    if not @deps
+    if not @deps.length
       do @_define
     else
       toLoad = @deps.length
@@ -67,8 +76,8 @@ class Module
       alert "#{@name}.defines failed: #{e}"
       onload @name for onload in @onloads
 
-    hasKey = () ->
-      for own key of self when key isnt '__ccModName'
+    hasKey = () =>
+      for own key of self when key isnt '__cc'
         return true
       false
 
@@ -138,6 +147,15 @@ class CC
     else
       obj[lastComp] = val
     this
+
+  get: (id) ->
+    ret = @global
+    for modId in id.split '.'
+      try
+        ret = ret[modId]
+      catch e
+        throw "cc.get accessing #{id} at #{modId}"
+    return ret
 
   class: (ns, clss) ->
     if not Class?

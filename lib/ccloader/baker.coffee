@@ -47,11 +47,17 @@ packModule = (modName) ->
 class Module
   constructor: (@name) ->
     @status = 'packing'
+    @libs = []
     currFileMods.push this
 
   requires: (libs...) ->
     verbose "module #{@name} requires #{libs}"
-    @libs = libs
+    @libs.push lib for lib in libs
+    this
+
+  parent: (lib) ->
+    verbose "module #{@name} has parent #{lib}"
+    @libs.push lib
     this
 
   defines: -> {}

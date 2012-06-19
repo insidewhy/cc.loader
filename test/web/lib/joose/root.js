@@ -1,4 +1,4 @@
-cc.module('joose.root').requires('joose.Enemy', 'joose.Boss').defines (function(self) {
+cc.module('joose.root').requires('joose.EndBoss').defines (function(self) {
   // Use self.class to create a class inside of the module namespace.
   self.class('Friend', {
     methods: {
@@ -13,7 +13,7 @@ cc.module('joose.root').requires('joose.Enemy', 'joose.Boss').defines (function(
 
   var friend = new joose.root.Friend(),
       enemy  = new joose.Enemy(),
-      boss   = new joose.Boss();
+      boss   = new joose.EndBoss();
 
   friend.greet();
   enemy.greet();

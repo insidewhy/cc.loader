@@ -161,9 +161,24 @@ cc.module('joose.Boss').requires('joose.Enemy').defines(function(self) {
 });
 ```
 
+Shorthand to create a module class that inherits another:
+```javascript
+// file: lib/root/EndBoss.js
+cc.module('joose.EndBoss').parent('joose.Boss').class({
+  // isa: joose.Boss, // not necessary, handled by .parent(...)
+  after: {
+    attack: function() {
+      jconsole.log("special attack");
+      jconsole.log("defeat");
+      jconsole.log("is the princess");
+    }
+  }
+});
+```
+
 ```javascript
 // file: lib/root.js
-cc.module('root').requires('root.Enemy').defines (function(self) {
+cc.module('root').requires('root.EndBoss').defines (function(self) {
   self.class('Friend', {
     methods: {
       greet: function() { console.log("friendly greets"); }
@@ -171,12 +186,10 @@ cc.module('root').requires('root.Enemy').defines (function(self) {
   });
 
   var friend = new root.Friend(),
-      enemy  = new root.Enemy(),
-      boss   = new joose.Boss();
+      enemy  = new joose.EndBoss();
 
   friend.greet();
-  enemy.greet();
-  boss.attack();
+  enemy.attack();
 })
 ```
 
