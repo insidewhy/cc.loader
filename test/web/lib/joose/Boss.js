@@ -3,7 +3,7 @@ cc.module('joose.Boss').requires('joose.Enemy').defines(function() {
   // in order for the inheritance to work.
   this.class({
     isa: joose.Enemy,
-    override: {
+    methods: {
       attack: function() {
         jconsole.log("throw hammer");
         this.SUPER();

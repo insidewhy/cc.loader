@@ -112,7 +112,7 @@ class CC
 
   # given "grandparent.parent.element"
   #    creates: cc.global.grandparent = { parent = {} }
-  #    returns: [ cc.grandparent.parent, element ]
+  #    returns: [ cc.grandparent.parent, "element" ]
   namespaceFor: (ns) ->
     obj = @global
     components = ns.split '.'
@@ -131,8 +131,9 @@ class CC
   # e.g. ns = "hey.baby", val = "1"
   #   -> hey.baby = 1
   # If the namespace already exists then this call will throw an exception
-  # unless the target and source are both objects, in which case the target
-  # keys are merged into the source object.
+  # unless the target and source are both objects. In this case the keys
+  # in the source object are merged into the target object, overwriting
+  # them as necessary.
   set: (ns, val) ->
     # console.log "cc.set #{ns} = #{val}"
     [ obj, lastComp ] = @namespaceFor ns
@@ -177,6 +178,7 @@ class CC
     this
 
   # loads a script into the head of the browser and call success/error callbacks
+  # IE 8 and below can not support the "onload" callback.
   loadScript: (path, onload, onerror) ->
     script = document.createElement 'script'
     script.type = 'text/javascript'

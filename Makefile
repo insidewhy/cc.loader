@@ -2,7 +2,7 @@
 
 coffee = ./node_modules/coffee-script/bin/coffee
 
-cc.js: npm
+cc.loader.js: npm
 
 npm:
 	@npm >/dev/null install
