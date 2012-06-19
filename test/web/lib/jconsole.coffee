@@ -1,5 +1,5 @@
 cc.module('jconsole')
-  .defines (self) ->
+  .defines () ->
     logPane = null
     backup = []
     clearLog = () ->
@@ -8,7 +8,7 @@ cc.module('jconsole')
 
     # clearLogInterval = () ->
 
-    self.log = (args...) ->
+    @log = (args...) ->
       newLine = document.createElement 'div'
       newLine.innerHTML = args.join(' ') + '<br/>'
       try

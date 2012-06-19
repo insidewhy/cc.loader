@@ -1,7 +1,7 @@
 cc.module('friend')
   .requires('pet.cat')
-  .defines (meta) ->
-    meta.log = (style) ->
+  .defines () ->
+    @log = (style) ->
       jconsole.log 'friend is: ', style
     pet.cat.talk "friend"
     cc.set 'friend.hero', 'mighty'

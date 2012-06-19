@@ -19,7 +19,7 @@ To create a module with dependencies:
 ```javascript
 cc.module('root')
   .requires('module', 'other.submodule')
-  .defines (function(self) {
+  .defines (function() {
     // code for this module, runs after required modules are loaded.
   });
 ```
@@ -49,21 +49,21 @@ modules and namespaces
 ----------------------
 Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them.
 
-The first argument passed to the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
+The this object inside of the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
 ```javascript
-cc.module('pet.cat').defines(function(self) {
+cc.module('pet.cat').defines(function() {
   // This makes pet.cat.style available to all modules that require pet.cat
   // Equivalent to: cc.set('pet.cat.style', 'sleepy');
-  self.style = 'sleepy';
+  this.style = 'sleepy';
 
-  // Equivalent to self.sound = 'meow'.
-  self.set('sound', 'meow');
+  // Equivalent to this.sound = 'meow'.
+  this.set('sound', 'meow');
 
   // Also works to set pet.cat.friend.(dog/human):
-  self.set('friend.dog',   false);
-  self.set('friend.human', true);
+  this.set('friend.dog',   false);
+  this.set('friend.human', true);
 
-  // The "pet.cat" namespace will only be created if the self object
+  // The "pet.cat" namespace will only be created if "this"
   // contains at least one key, otherwise other mechanisms like cc.set can
   // be used to populate the module namespace and/or other namespaces.
 });
@@ -72,8 +72,8 @@ cc.module('pet.cat').defines(function(self) {
 Two modules split over two files:
 ```javascript
 // file: lib/pet/cat.js
-cc.module('pet.cat').defines (function(self) {
-  self.talk = function(word) { console.log('mew' + word + 'mew'); }
+cc.module('pet.cat').defines (function() {
+  this.talk = function(word) { console.log('mew' + word + 'mew'); }
 });
 ```
 
@@ -82,7 +82,7 @@ cc.module('pet.cat').defines (function(self) {
 cc.module('root').requires('pet.cat').defines (function() {
   pet.cat.talk('prr');
 
-  // this module elects not to use self and sets global variables manually.
+  // this module elects not to use "this" and sets global variables manually.
   cc.global.Root = "important string!!"
 
   // cc.global is a reference to the global "window" object in JavaScript, or
@@ -148,8 +148,8 @@ integration with joose
 
 To create a Joose class under the module namespace:
 ```javascript
-cc.module('joose.root').defines (function(self) {
-  self.class('Friend', {
+cc.module('joose.root').defines (function() {
+  this.class('Friend', {
     methods: {
       greet: function() { console.log("friendly greets"); }
     }
@@ -176,10 +176,10 @@ cc.module('root.Enemy').class({
 An alternative way of making a module that is a Joose class:
 ```javascript
 // file: lib/root/Boss.js
-cc.module('joose.Boss').requires('joose.Enemy').defines(function(self) {
-  // uses self.class as it must be postponed until after joose.Enemy has loaded
+cc.module('joose.Boss').requires('joose.Enemy').defines(function() {
+  // uses this.class as it must be postponed until after joose.Enemy has loaded
   // in order for the inheritance to work.
-  self.class({
+  this.class({
     isa: joose.Enemy,
     override: {
       attack: function() {
@@ -209,8 +209,8 @@ cc.module('joose.EndBoss').parent('joose.Boss').class({
 
 ```javascript
 // file: lib/root.js
-cc.module('root').requires('root.EndBoss').defines (function(self) {
-  self.class('Friend', {
+cc.module('root').requires('root.EndBoss').defines (function() {
+  this.class('Friend', {
     methods: {
       greet: function() { console.log("friendly greets"); }
     }

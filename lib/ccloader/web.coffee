@@ -70,7 +70,7 @@ class Module
     self = new Self @name
 
     try
-      @defineCallback self
+      @defineCallback.call self
     catch e
       @status = 'failed'
       alert "#{@name}.defines failed: #{e}"

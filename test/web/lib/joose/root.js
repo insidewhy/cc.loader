@@ -1,6 +1,6 @@
-cc.module('joose.root').requires('joose.EndBoss').defines (function(self) {
-  // Use self.class to create a class inside of the module namespace.
-  self.class('Friend', {
+cc.module('joose.root').requires('joose.EndBoss').defines (function() {
+  // Use this.class to create a class inside of the module namespace.
+  this.class('Friend', {
     methods: {
       greet: function() { jconsole.log("friendly greets"); }
     }
