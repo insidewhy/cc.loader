@@ -1,13 +1,13 @@
 cc.module('joose.root').requires('joose.EndBoss').defines (function() {
-  // Use this.class to create a class inside of the module namespace.
-  this.class('Friend', {
+  // Use this.jClass to create a class inside of the module namespace.
+  this.jClass('Friend', {
     methods: {
       greet: function() { jconsole.log("friendly greets"); }
     }
   });
 
-  // Using cc.class to do the same thing the long way
-  cc.class('joose.root.Colleague', {
+  // Using cc.jClass to do the same thing the long way
+  cc.jClass('joose.root.Colleague', {
     methods: { greet: function() { jconsole.log("..."); } }
   });
 

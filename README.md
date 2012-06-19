@@ -149,12 +149,12 @@ integration with joose
 To create a Joose class under the module namespace:
 ```javascript
 cc.module('joose.root').defines (function() {
-  this.class('Friend', {
+  this.jClass('Friend', {
     methods: {
       greet: function() { console.log("friendly greets"); }
     }
   });
-  // equivalent to: cc.class('joose.root.Friend', ...)
+  // equivalent to: cc.jClass('joose.root.Friend', ...)
 
   var friend = new joose.root.Friend();
   friend.greet();
@@ -164,7 +164,7 @@ cc.module('joose.root').defines (function() {
 A module itself can be a Joose class:
 ```javascript
 // file: lib/root/Enemy.js
-cc.module('root.Enemy').class({
+cc.module('root.Enemy').jClass({
   // The module is the Joose class. I start these files with a capital letter
   // but it isn't mandatory.
   methods: {
@@ -177,9 +177,9 @@ An alternative way of making a module that is a Joose class:
 ```javascript
 // file: lib/root/Boss.js
 cc.module('joose.Boss').requires('joose.Enemy').defines(function() {
-  // uses this.class as it must be postponed until after joose.Enemy has loaded
+  // uses this.jClass as it must be postponed until after joose.Enemy has loaded
   // in order for the inheritance to work.
-  this.class({
+  this.jClass({
     isa: joose.Enemy,
     override: {
       attack: function() {
@@ -195,7 +195,7 @@ cc.module('joose.Boss').requires('joose.Enemy').defines(function() {
 Shorthand to create a module class that inherits another:
 ```javascript
 // file: lib/root/EndBoss.js
-cc.module('joose.EndBoss').parent('joose.Boss').class({
+cc.module('joose.EndBoss').parent('joose.Boss').jClass({
   // isa: joose.Boss, // not necessary, handled by .parent(...)
   after: {
     attack: function() {
@@ -210,7 +210,7 @@ cc.module('joose.EndBoss').parent('joose.Boss').class({
 ```javascript
 // file: lib/root.js
 cc.module('root').requires('root.EndBoss').defines (function() {
-  this.class('Friend', {
+  this.jClass('Friend', {
     methods: {
       greet: function() { console.log("friendly greets"); }
     }

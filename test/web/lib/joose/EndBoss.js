@@ -1,4 +1,4 @@
-cc.module('joose.EndBoss').parent('joose.Boss').class({
+cc.module('joose.EndBoss').parent('joose.Boss').jClass({
   after: {
     attack: function() {
       jconsole.log("special attack");

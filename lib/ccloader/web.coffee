@@ -2,11 +2,11 @@ class Self
   constructor: (ccModName) ->
     this.__cc = modName: ccModName
   _getName: (name) -> "#{@__cc.modName}.#{name}"
-  class: (name, val) ->
+  jClass: (name, val) ->
     if val
-      cc.class @_getName(name), val
+      cc.jClass @_getName(name), val
     else
-      cc.class @__cc.modName, name
+      cc.jClass @__cc.modName, name
     this
   set: (name, val) ->
     cc.set @_getName(name), val
@@ -32,11 +32,11 @@ class Module
     @onloads.push callback
     this
 
-  class: (classContent) ->
+  jClass: (classContent) ->
     @defines =>
       if @_parent
         classContent.isa = cc.get @_parent
-      cc.class @name, classContent
+      cc.jClass @name, classContent
     this
 
   defines: (@defineCallback) ->
@@ -73,7 +73,7 @@ class Module
       @defineCallback.call self
     catch e
       @status = 'failed'
-      alert "#{@name}.defines failed: #{e}"
+      alert "#{@name}.defines failed: #{e.message}"
       onload @name for onload in @onloads
 
     hasKey = () =>
@@ -158,9 +158,9 @@ class CC
         throw "cc.get accessing #{id} at #{modId}"
     return ret
 
-  class: (ns, clss) ->
+  jClass: (ns, clss) ->
     if not Class?
-      throw 'please install Joose to use cc.class'
+      throw 'please install Joose to use cc.jClass'
     @namespaceFor ns
     Class ns, clss
     this

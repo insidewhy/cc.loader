@@ -62,8 +62,7 @@ class Module
 
   defines: -> {}
   empty: -> {}
-  class: -> {}
-  jooseClass: -> {}
+  jClass: -> {}
 
   defineRequirements: ->
     if @libs
