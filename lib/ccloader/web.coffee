@@ -203,8 +203,6 @@ class CC
     script.src = path
     @head.appendChild script
     script
-    this
-
 
   # require module name, with optional callback on success.
   # passes failed module name to callback on error, null on success.
