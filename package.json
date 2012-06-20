@@ -25,7 +25,7 @@
       "node": ">=0.4.0"
     },
     "scripts": {
-        "install": "coffee -p lib/ccloader/web.coffee > cc.loader.js"
+        "install": "coffee -p lib/ccloader/web.coffee > ccloader.js"
     },
     "directories": {
         "lib": "./lib/ccloader"

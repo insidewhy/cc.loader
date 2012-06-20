@@ -1,7 +1,7 @@
 .*.swp
 Makefile.local
 /node_modules
-/test/web/cc.loader.js
+/test/web/ccloader.js
 /test/web/lib/friend.js
 /test/web/lib/jconsole.js
 /test/web/lib/incmissing.js
@@ -10,4 +10,4 @@ Makefile.local
 /test/web/lib/packed.js
 /test/web/joose.js
 /test/web/joose-2.1.js
-/cc.loader.js
+/ccloader.js

@@ -96,7 +96,7 @@ loading modules
 ---------------
 To use from html without baking:
 ```html
-<script type="text/JavaScript" src="cc.js"></script>
+<script type="text/JavaScript" src="ccloader.js"></script>
 <script type="text/JavaScript">
     cc.libpath = 'lib'; // URL to the folder containing all your modules.
                         // lib is the default.

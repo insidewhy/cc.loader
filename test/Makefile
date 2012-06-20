@@ -2,14 +2,14 @@
 
 coffee = ../node_modules/coffee-script/bin/coffee
 
-build: web/cc.loader.js web/joose.js web/lib/packed.js
+build: web/ccloader.js web/joose.js web/lib/packed.js
 
 bake-test: web/lib/packed.js
 
 serve: build
 	@${coffee} serve.coffee web
 
-web/cc.loader.js: ../cc.loader.js
+web/ccloader.js: ../ccloader.js
 	@ln -nsf ../$< $@
 
 web/joose.js:
