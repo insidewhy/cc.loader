@@ -7,5 +7,6 @@
 /test/lib/pet/cat.js
 /test/lib/pet/dog.js
 /test/lib/packed.js
+/test/lib/funct.js
 /test/joose*.js
 /ccloader.js

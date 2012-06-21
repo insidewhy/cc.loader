@@ -3,9 +3,10 @@
 cc.module('punch').empty()
 
 cc.module('root')
-  .requires('dropper', 'friend')
+  .requires('dropper', 'friend', 'funct')
   .defines (function() {
     friend.log(friend.hero)
+    jconsole.log(funct())
   })
 
 // vim:ts=2 sw=2

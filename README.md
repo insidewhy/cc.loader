@@ -232,6 +232,15 @@ A module doesn't have to have a "defines" call but if not it must call "empty". 
 cc.module('util').requires('util.file', 'util.path').empty();
 ```
 
+module that is a function
+-------------------------
+```javascript
+// This module only defines a function at the corresponding namespace.
+cc.module('some.function').func(function() {
+  console.log("some!");
+})
+```
+
 notes on development
 --------------------
 IE makes it very difficult to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module structure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.

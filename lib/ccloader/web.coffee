@@ -39,6 +39,11 @@ class Module
       cc.jClass @name, classContent
     this
 
+  func: (_function) ->
+    @defines =>
+      cc.set @name, _function
+    this
+
   defines: (@defineCallback) ->
     if not @deps.length
       do @_define
