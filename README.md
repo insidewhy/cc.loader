@@ -252,8 +252,8 @@ testing
 ```
 % git clone git://github.com/nuisanceofcats/ccloader.git
 % cd ccloader
-% make test
-make[1]: Entering directory `/home/james/projects/ccloader/test'
+% npm install
+% cake test
 ccloader test server listening on: 8012
 please go to http://localhost:8012/
 ```

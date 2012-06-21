@@ -1,6 +1,6 @@
 {
     "name":    "ccloader",
-    "description": "A javascript module loading/creation system for the web including support for baking. Written in coffeescript.",
+    "description": "A javascript module loading/creation system for the web including support for baking.",
     "author": {
         "name": "James Pike",
         "email": "npm@chilon.net",
@@ -17,15 +17,13 @@
         "joose": "3.50.0"
     },
     "licenses": [
-        {
-            "type": "MIT"
-        }
+        { "type": "MIT" }
     ],
     "engines": {
       "node": ">=0.4.0"
     },
     "scripts": {
-        "install": "coffee -p lib/ccloader/web.coffee > ccloader.js"
+        "install": "cake web"
     },
     "directories": {
         "lib": "./lib/ccloader"

@@ -97,7 +97,7 @@ class CC
     # alert "firefox: #{@firefoxVersion}, ie: #{@ieVersion}"
     @libpath = 'lib'
     @modules = {}
-    @global = window
+    @global = window ? window : GLOBAL
     @head = document.getElementsByTagName('head')[0]
     @ieScriptPollTimeout = 5000
 
@@ -265,6 +265,6 @@ class CC
 
     this
 
-window.cc = new CC
-
+cc = new CC
+cc.global.cc = cc
 # vim:ts=2 sw=2

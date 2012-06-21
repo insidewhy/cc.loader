@@ -209,15 +209,14 @@ modulesToSource = (modules) ->
   outputCoffee = (root) ->
     jsCode = coffee.compile(fs.readFileSync("#{root}.coffee").toString())
     targetCode += jsCode unless options.compileCoffeOnly
-    unless options.doNotCompileCoffee
-      fs.writeFileSync("#{root}.js", jsCode)
+    fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileCoffee
 
   outputJs path.join path.dirname(path.dirname __dirname), 'ccloader.js'
 
   for mod in modules
-    if mod.path.match(/\.js$/)
+    if /\.js$/.test mod.path
       outputJs mod.path
-    else if mod.path.match(/\.coffee$/)
+    else if /\.coffee$/.test mod.path
       outputCoffee mod.path.replace /\.coffee$/, ''
     else if path.existsSync "#{mod.path}.coffee"
       outputCoffee mod.path
