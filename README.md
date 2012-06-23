@@ -214,7 +214,8 @@ cc.module('root').requires('root.EndBoss').defines (function() {
 })
 ```
 
-## hooking in your own class system
+## hooks for custom class systems.
+```javascript
 cc.module('Cat').defines(function() {
   // "extend" can be used to hook your own class system in
   self.set('extend', function(class) {
@@ -222,7 +223,9 @@ cc.module('Cat').defines(function() {
     return class;
   })
 })
+```
 
+```javascript
 // Since the parent namespace "Cat" defines "extend", then HouseCat is set to
 // the return value of Cat.extend(<argument to jClass>)
 // In this case defining:
@@ -231,6 +234,12 @@ cc.module('Cat').defines(function() {
 cc.module('HouseCat').parent('Cat').jClass({
     playful: true
 })
+```
+
+```javascript
+var c = HouseCat
+console.log(c.catlike, c.playful) // true, true
+```
 
 ## empty modules
 A module doesn't have to have a "defines" call but if not it must call "empty". This can be useful for creating modules that serve only to bundle other modules together:
