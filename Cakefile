@@ -17,6 +17,7 @@ task 'test', 'test cc.loader', (options) ->
     'ln -sf ../cc test'
     'cp -n node_modules/joose/joose-all-web.js test/joose.js'
     './bin/ccbaker test/lib/root.js test/lib/joose/root.js > test/lib/packed.js'
+    'coffee -c test/lib/incmissing.coffee'
     ->
       express = require 'express'
       app     = express.createServer()
