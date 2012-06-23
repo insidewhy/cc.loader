@@ -36,13 +36,15 @@ class Module
     @defines =>
       if @_parent
         parent = cc.get @_parent
-        if parent.extend
+        if not parent
+          throw "parent #{@_parent} does not exist"
+        else if parent.extend
           # if parent class has "extend" static method then use that to
           # create parent class instead of joose
           cc.set @name, parent.extend(classContent)
           return
         else
-          classContent.isa = cc.get @_parent
+          classContent.isa = parent
       cc.jClass @name, classContent
     this
 
