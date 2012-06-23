@@ -1,20 +1,16 @@
-cc.loader
-========
+# cc.loader
 
 A JavaScript module loading/creation system for the web including support for baking. It includes support for asynchronously loading modules and their dependencies from multiple script files using a simple but powerful JavaScript API. It can optionally integrate with [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) to ease adding classes to modules or creating module files that are classes. cc.loader is written in CoffeeScript but supports JavaScript and CoffeeScript modules and compiles/bakes all CoffeeScript to JavaScript. 
 
-installation
-============
+# installation
 
 To install globally:
 
     sudo npm install -g cc.loader
 
-usage
-=====
+# usage
 
-creating modules
-----------------
+## creating modules
 To create a module with dependencies:
 ```javascript
 cc.module('root')
@@ -45,8 +41,7 @@ cc.module('friend.root').defines(function() {
 });
 ```
 
-modules and namespaces
-----------------------
+## modules and namespaces
 Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but cc.loader provides simple mechanisms to do so if you want to use them.
 
 The this object inside of the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
@@ -92,8 +87,7 @@ cc.module('root').requires('pet.cat').defines (function() {
 
 Multiple modules can exist in a single file but only things defined by the module which has a name corresponding to the filesystem path are publicly available when "defines" callbacks of including modules are run.
 
-loading modules
----------------
+## loading modules
 To use from html without baking:
 ```html
 <script type="text/JavaScript" src="cc/loader.js"></script>
@@ -108,8 +102,7 @@ To use from html without baking:
 </script>
 ```
 
-baking
-======
+# baking
 When using cc.require or &lt;script&gt; tags one web request is made to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing cc.loader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) JavaScript file which can be loaded quickly.
 
 To bake a module together with its dependencies and minify the output:
@@ -139,11 +132,8 @@ e.g. Bake the modules reachable from two files without minifying the output:
 % ccbaker -m primary.js secondary.coffee > output.min.js
 ```
 
-advanced usage
-==============
-
-integration with joose
-----------------------
+# advanced usage
+## integration with joose
 [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) is a object system for JavaScript. cc.loader provides some utility functions for creating Joose classes using the suggested namespace structure.
 
 To create a Joose class under the module namespace:
@@ -224,8 +214,7 @@ cc.module('root').requires('root.EndBoss').defines (function() {
 })
 ```
 
-hooking in your own class system
---------------------------------
+## hooking in your own class system
 cc.module('Cat').defines(function() {
   // "extend" can be used to hook your own class system in
   self.set('extend', function(class) {
@@ -243,16 +232,14 @@ cc.module('HouseCat').parent('Cat').jClass({
     playful: true
 })
 
-empty modules
--------------
+## empty modules
 A module doesn't have to have a "defines" call but if not it must call "empty". This can be useful for creating modules that serve only to bundle other modules together:
 
 ```javascript
 cc.module('util').requires('util.file', 'util.path').empty();
 ```
 
-module that is a function
--------------------------
+## module that is a function
 ```javascript
 // This module only defines a function at the corresponding namespace.
 cc.module('some.function').func(function() {
@@ -260,8 +247,7 @@ cc.module('some.function').func(function() {
 })
 ```
 
-notes on development
---------------------
+## notes on development
 IE makes it very difficult to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module structure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
 
 The poll timeout can be set with the following code and should be set before requiring the first module:
@@ -270,13 +256,11 @@ cc.ieScriptPollTimeout = 5000; // in milliseconds, 5000 is the default
 ```
 The reason every file requires a module corresponding to the filename is to support IE 8 and below.
 
-dependencies
-============
+# dependencies
  * baker: node.js, npm will fetch other node module dependencies for you.
  * web: nothing to use the library or a baked library. If Joose is loaded then a small amount of extra API is available.
 
-testing
-=======
+# testing
 ```
 % git clone git://github.com/nuisanceofcats/cc.loader.git
 % cd cc.loader
@@ -285,7 +269,6 @@ cc.loader test server listening on: 8012
 please go to http://localhost:8012/
 ```
 
-FAQ
-===
+# FAQ
  * What does the name mean? I like [C.C. Lemon](http://en.wikipedia.org/wiki/C.C._Lemon)
  * Why not [RequireJS](http://requirejs.org/)? - RequireJS supports a lot of things, but has a large manual so it can be perceived as rather difficult to use. I prefer to use the namespacing system cc.loader provides over assigning every dependency to a variable as in RequireJS.
