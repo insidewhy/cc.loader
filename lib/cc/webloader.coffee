@@ -111,7 +111,7 @@ class CC
     # alert "firefox: #{@firefoxVersion}, ie: #{@ieVersion}"
     @libpath = 'lib'
     @modules = {}
-    @global = window ? window : GLOBAL
+    @global = if window then window else GLOBAL
     @head = document.getElementsByTagName('head')[0]
     @ieScriptPollTimeout = 5000
 

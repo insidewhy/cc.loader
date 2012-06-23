@@ -212,7 +212,7 @@ modulesToSource = (modules) ->
     targetCode += jsCode unless options.compileCoffeOnly
     fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileCoffee
 
-  outputJs path.join path.dirname(path.dirname __dirname), 'ccloader.js'
+  outputJs path.join path.dirname(path.dirname __dirname), 'cc', 'loader.js'
 
   for mod in modules
     if /\.js$/.test mod.path

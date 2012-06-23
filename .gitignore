@@ -1,6 +1,6 @@
 .*.swp
 /node_modules
-/test/ccloader.js
+/test/cc
 /test/lib/friend.js
 /test/lib/jconsole.js
 /test/lib/incmissing.js
@@ -9,4 +9,4 @@
 /test/lib/packed.js
 /test/lib/funct.js
 /test/joose*.js
-/ccloader.js
+/cc

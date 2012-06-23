@@ -1,12 +1,12 @@
 {
-    "name":    "ccloader",
+    "name":    "cc.loader",
     "description": "A javascript module loading/creation system for the web including support for baking.",
     "author": {
         "name":   "James Pike",
         "email":  "npm@chilon.net",
         "web":    "http://chilon.net"
     },
-    "version": "0.17.0",
+    "version": "0.18.0",
     "dependencies": {
         "coffee-script": "1.3.3",
         "uglify-js":     "1.3.1",
@@ -28,7 +28,7 @@
         "test":    "npm install && cake test"
     },
     "directories": {
-        "lib": "./lib/ccloader"
+        "lib": "./lib/cc"
     },
     "bin": {
         "ccbaker": "./bin/ccbaker"

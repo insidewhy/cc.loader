@@ -1,14 +1,14 @@
-ccloader
+cc.loader
 ========
 
-A JavaScript module loading/creation system for the web including support for baking. It includes support for asynchronously loading modules and their dependencies from multiple script files using a simple but powerful JavaScript API. It can optionally integrate with [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) to ease adding classes to modules or creating module files that are classes. ccloader is written in CoffeeScript but supports JavaScript and CoffeeScript modules and compiles/bakes all CoffeeScript to JavaScript. 
+A JavaScript module loading/creation system for the web including support for baking. It includes support for asynchronously loading modules and their dependencies from multiple script files using a simple but powerful JavaScript API. It can optionally integrate with [Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) to ease adding classes to modules or creating module files that are classes. cc.loader is written in CoffeeScript but supports JavaScript and CoffeeScript modules and compiles/bakes all CoffeeScript to JavaScript. 
 
 installation
 ============
 
 To install globally:
 
-    sudo npm install -g ccloader
+    sudo npm install -g cc.loader
 
 usage
 =====
@@ -24,7 +24,7 @@ cc.module('root')
   });
 ```
 
-Each ccloader module file must define a module name corresponding to its path otherwise the module  will fail to load (but with a helpful error message). For example "other.submodule" must be defined in "other/submodule.js" or "other/submodule.coffee". A configurable prefix which defaults to "lib" can also be prepended to the script path. Conversely when requiring a module as a dependency the filesystem path to load it from is determined from the module path.
+Each cc.loader module file must define a module name corresponding to its path otherwise the module  will fail to load (but with a helpful error message). For example "other.submodule" must be defined in "other/submodule.js" or "other/submodule.coffee". A configurable prefix which defaults to "lib" can also be prepended to the script path. Conversely when requiring a module as a dependency the filesystem path to load it from is determined from the module path.
 
 Populating a module with cc.set:
 ```javascript
@@ -47,7 +47,7 @@ cc.module('friend.root').defines(function() {
 
 modules and namespaces
 ----------------------
-Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but ccloader provides simple mechanisms to do so if you want to use them.
+Each module has an associated JavaScript namespace with an identical name. There is no requirement for a module to populate this namespace but cc.loader provides simple mechanisms to do so if you want to use them.
 
 The this object inside of the "defines" callback can be used to inject functions and variables into the JavaScript namespace associated with a module name:
 ```javascript
@@ -96,7 +96,7 @@ loading modules
 ---------------
 To use from html without baking:
 ```html
-<script type="text/JavaScript" src="ccloader.js"></script>
+<script type="text/JavaScript" src="cc/loader.js"></script>
 <script type="text/JavaScript">
     cc.libpath = 'lib'; // URL to the folder containing all your modules.
                         // lib is the default.
@@ -110,7 +110,7 @@ To use from html without baking:
 
 baking
 ======
-When using cc.require or &lt;script&gt; tags one web request is made to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing ccloader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) JavaScript file which can be loaded quickly.
+When using cc.require or &lt;script&gt; tags one web request is made to load each script. Each request involves a potentially large set of replicated headers which slows down the load speed of the page. Installing cc.loader provides the "ccbaker" command which can be used to combine all modules reachable from a certain module file into a single (potentially minified/obfuscated) JavaScript file which can be loaded quickly.
 
 To bake a module together with its dependencies and minify the output:
 ```
@@ -144,7 +144,7 @@ advanced usage
 
 integration with joose
 ----------------------
-[Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) is a object system for JavaScript. ccloader provides some utility functions for creating Joose classes using the suggested namespace structure.
+[Joose](http://joose.github.com/Joose/doc/html/Joose/Manual.html) is a object system for JavaScript. cc.loader provides some utility functions for creating Joose classes using the suggested namespace structure.
 
 To create a Joose class under the module namespace:
 ```javascript
@@ -278,14 +278,14 @@ dependencies
 testing
 =======
 ```
-% git clone git://github.com/nuisanceofcats/ccloader.git
-% cd ccloader
+% git clone git://github.com/nuisanceofcats/cc.loader.git
+% cd cc.loader
 % npm test
-ccloader test server listening on: 8012
+cc.loader test server listening on: 8012
 please go to http://localhost:8012/
 ```
 
 FAQ
 ===
  * What does the name mean? I like [C.C. Lemon](http://en.wikipedia.org/wiki/C.C._Lemon)
- * Why not [RequireJS](http://requirejs.org/)? - RequireJS supports a lot of things, but has a large manual so it can be perceived as rather difficult to use. I prefer to use the namespacing system ccloader provides over assigning every dependency to a variable as in RequireJS.
+ * Why not [RequireJS](http://requirejs.org/)? - RequireJS supports a lot of things, but has a large manual so it can be perceived as rather difficult to use. I prefer to use the namespacing system cc.loader provides over assigning every dependency to a variable as in RequireJS.
