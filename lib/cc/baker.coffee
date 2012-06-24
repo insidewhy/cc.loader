@@ -63,7 +63,7 @@ class Module
   defines: -> {}
   empty: -> {}
   jClass: -> {}
-  func: -> {}
+  set: -> {}
 
   defineRequirements: ->
     if @libs

@@ -1,2 +1,2 @@
-cc.module('funct').func ->
+cc.module('funct').set ->
   return "funct fu"

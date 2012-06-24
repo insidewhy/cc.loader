@@ -9,7 +9,10 @@ class Self
       cc.jClass @__cc.modName, name
     this
   set: (name, val) ->
-    cc.set @_getName(name), val
+    if typeof val isnt 'undefined'
+      cc.set @_getName(name), val
+    else
+      cc.set @__cc.modName, name
     this
 
 class Module
@@ -48,9 +51,8 @@ class Module
       cc.jClass @name, classContent
     this
 
-  func: (_function) ->
-    @defines =>
-      cc.set @name, _function
+  set: (val) ->
+    @defines => cc.set @name, val
     this
 
   defines: (@defineCallback) ->

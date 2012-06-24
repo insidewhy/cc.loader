@@ -245,7 +245,7 @@ cc.module('util').requires('util.file', 'util.path').empty();
 ## module that is a function
 ```javascript
 // This module only defines a function at the corresponding namespace.
-cc.module('some.function').func(function() {
+cc.module('some.function').set(function() {
   console.log("some!");
 })
 ```
