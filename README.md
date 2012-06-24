@@ -31,7 +31,7 @@ cc.module('friend.root').defines(function() {
   // most modules and/or projects.
   cc.set('friend.root.favourite', 'cat');
 
-  // You can populate any namespace from a module if you want.
+  // Namespaces other than the associated namespace can be populated.
   cc.set('friendly.Root.SayingsOf', { cat: 'meow', dog: 'woof' });
 
   // The namespace elements defined in this module will be available to the
@@ -92,12 +92,11 @@ To use from html without baking:
 ```html
 <script type="text/JavaScript" src="cc/loader.js"></script>
 <script type="text/JavaScript">
-    cc.libpath = 'lib'; // URL to the folder containing all your modules.
+    cc.libpath = 'lib'; // URL to the folder containing all modules.
                         // lib is the default.
 
-    // assumes your module is at "lib/root/master.js". This will in turn load
-    // all dependency modules and you will be able to debug them with their full
-    // file paths.
+    // assumes required module is at "lib/root/master.js". This will in turn load
+    // all dependency modules and they can be debugged with full file paths.
     cc.require("root.master");
 </script>
 ```
@@ -214,31 +213,26 @@ cc.module('root').requires('root.EndBoss').defines (function() {
 })
 ```
 
-## hooks for custom class systems.
+## hooks for custom class systems
 ```javascript
 cc.module('Cat').defines(function() {
-  // "extend" can be used to hook your own class system in
-  self.set('extend', function(class) {
-    class.catlike = true;
-    return class;
+  // A 'extend' function can be used as a custom hook into the class system
+  // for when a module sets this one as a parent.
+  self.set('extend', function(clss) {
+    clss.catlike = true;
+    return clss;
   })
 })
 ```
 
 ```javascript
 // Since the parent namespace "Cat" defines "extend", then HouseCat is set to
-// the return value of Cat.extend(<argument to jClass>)
-// In this case defining:
-//    HouseCat.catlike = true
-//    HouseCat.playful = true
-cc.module('HouseCat').parent('Cat').jClass({
-    playful: true
-})
+// the return value of Cat.extend({ playful: true })
+cc.module('HouseCat').parent('Cat').jClass({ playful: true })
 ```
 
 ```javascript
-var c = HouseCat
-console.log(c.catlike, c.playful) // true, true
+console.log(HouseCat.catlike, HouseCat.playful) // true, true
 ```
 
 ## empty modules
@@ -257,7 +251,7 @@ cc.module('some.function').func(function() {
 ```
 
 ## notes on development
-IE makes it very difficult to reliably determine whether a script has loaded without polling, so you will not see errors indicating module load failures until after a 10 second or so delay. For this reason developing your module structure under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
+IE makes it very difficult to reliably determine whether a script has loaded without polling, so errors indicating module load failures will not be seen until after a 10 second or so delay. For this reason developing module structures under IE is not recommended. Once the module structure works then debugging code under IE with full path names should be as easy as in a decent browser.
 
 The poll timeout can be set with the following code and should be set before requiring the first module:
 ```javascript
@@ -266,7 +260,7 @@ cc.ieScriptPollTimeout = 5000; // in milliseconds, 5000 is the default
 The reason every file requires a module corresponding to the filename is to support IE 8 and below.
 
 # dependencies
- * baker: node.js, npm will fetch other node module dependencies for you.
+ * baker: node.js, npm will fetch other node module dependencies.
  * web: nothing to use the library or a baked library. If Joose is loaded then a small amount of extra API is available.
 
 # testing
