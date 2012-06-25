@@ -116,10 +116,13 @@ Full arguments:
 % ccbaker -h
 ccbaker [arguments] <paths to source files>
   arguments:
-    -c            compile CoffeeScript modules to JavaScript only
-    -C            do not compile CoffeeScript to JavaScript
-    -m            do not minify JavaScript
-    -o            obfuscate JavaScript
+    -c            compile coffeescript modules to javascript only
+    -C            do not compile coffeescript to javascript
+    -i [path]     include raw source file before modules, can be used
+                  multiple times
+    -l            do not include cc.loader in output
+    -m            do not minify javascript
+    -o            obfuscate javascript
     -s            use strict mode for packed file
     -w  [path]    output baked file to [path] and keep watching all reachable
                   paths for changes, recreating baked file as they change

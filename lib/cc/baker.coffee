@@ -132,6 +132,9 @@ usage = () ->
       arguments:
         -c            compile coffeescript modules to javascript only
         -C            do not compile coffeescript to javascript
+        -i [path]     include raw source file before modules, can be used
+                      multiple times
+        -l            do not include cc.loader in output
         -m            do not minify javascript
         -o            obfuscate javascript
         -s            use strict mode for packed file
@@ -140,6 +143,8 @@ usage = () ->
         -v            print extra information to the terminal on stderr"""
 
 exports.run = (argv) ->
+  sourceFiles = [] # paths to source files
+
   if argv.length < 3
     do usage
     return
@@ -151,6 +156,13 @@ exports.run = (argv) ->
         options.compileCoffeOnly = true
       when '-C'
         options.doNotCompileCoffee = true
+      when '-i'
+        ++argvIdx
+        newFile = argv[argvIdx]
+        throw "-i requires argument" unless newFile
+        sourceFiles.push newFile
+      when '-l'
+        options.noCcLoader = true
       when '-s'
         options.useStrict = true
       when '-m'
@@ -184,8 +196,15 @@ exports.run = (argv) ->
       return
     ++argvIdx
 
-  verbose "modules:", [ mod.name for mod in modulesInDepOrder ]
-  targetCode = modulesToSource(modulesInDepOrder)
+  # ccloader comes after include files
+  if not options.noCcLoader
+    sourceFiles.push(
+      path.join path.dirname(path.dirname __dirname), 'cc', 'loader.js')
+
+  for mod in modulesInDepOrder
+    sourceFiles.push mod.path
+
+  targetCode = modulesToSource sourceFiles
   unless options.doNotMinify
     ast = uglParser.parse targetCode
     ast = uglifier.ast_mangle ast
@@ -201,7 +220,7 @@ exports.run = (argv) ->
   console.log targetCode
 
 # outputs modules in order given
-modulesToSource = (modules) ->
+modulesToSource = (files) ->
   targetCode = ''
 
   outputJs = (path) ->
@@ -212,17 +231,15 @@ modulesToSource = (modules) ->
     targetCode += jsCode unless options.compileCoffeOnly
     fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileCoffee
 
-  outputJs path.join path.dirname(path.dirname __dirname), 'cc', 'loader.js'
-
-  for mod in modules
-    if /\.js$/.test mod.path
-      outputJs mod.path
-    else if /\.coffee$/.test mod.path
+  for file in files
+    if /\.js$/.test file
+      outputJs file
+    else if /\.coffee$/.test file
       outputCoffee mod.path.replace /\.coffee$/, ''
-    else if path.existsSync "#{mod.path}.coffee"
-      outputCoffee mod.path
+    else if path.existsSync "#{file}.coffee"
+      outputCoffee file
     else
-      outputJs "#{mod.path}.js"
+      outputJs "#{file}.js"
 
   targetCode
 
