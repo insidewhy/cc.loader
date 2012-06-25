@@ -90,8 +90,8 @@ Multiple modules can exist in a single file but only things defined by the modul
 ## loading modules
 To use from html without baking:
 ```html
-<script type="text/JavaScript" src="cc/loader.js"></script>
-<script type="text/JavaScript">
+<script type="text/javascript" src="cc/loader.js"></script>
+<script type="text/javascript">
     cc.libpath = 'lib'; // URL to the folder containing all modules.
                         // lib is the default.
 

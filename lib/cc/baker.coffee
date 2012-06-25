@@ -235,7 +235,7 @@ modulesToSource = (files) ->
     if /\.js$/.test file
       outputJs file
     else if /\.coffee$/.test file
-      outputCoffee mod.path.replace /\.coffee$/, ''
+      outputCoffee file.replace /\.coffee$/, ''
     else if path.existsSync "#{file}.coffee"
       outputCoffee file
     else
