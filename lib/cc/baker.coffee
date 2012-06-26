@@ -262,7 +262,7 @@ modulesToSource = (files, options) ->
       outputJs file
     else if /\.coffee$/.test file
       outputCoffee file.replace /\.coffee$/, ''
-    else if path.existsSync "#{file}.coffee"
+    else if fs.existsSync "#{file}.coffee"
       outputCoffee file
     else
       outputJs "#{file}.js"
