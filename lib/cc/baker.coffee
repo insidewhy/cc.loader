@@ -8,7 +8,6 @@ uglifier = require("uglify-js").uglify
 libdir = null # full path to root of library tree
 modules = {}
 modulesInDepOrder = [] # modules ordered with dependencies first
-options = {} # options based on command line arguments
 
 currFilePath = null # path of current file being required
 currArgFile = null # current file from argv being processed
@@ -16,8 +15,10 @@ currFileMods = [] # modules in current file being processed
 fileModuleRequired = true
 # true when the module with the name of the current file is required
 
+__verbose = false
+
 verbose = (tolog...) ->
-  return unless options.verbose
+  return unless __verbose
   console.warn tolog.join(' ')
 
 moduleToPath = (modName) ->
@@ -142,8 +143,55 @@ usage = () ->
                       paths for changes, recreating baked file as they change
         -v            print extra information to the terminal on stderr"""
 
-exports.run = (argv) ->
-  sourceFiles = [] # paths to source files
+exports.bake = bake = (files, outputPath, options) ->
+  if not options
+    options = outputPath
+    outputPath = null
+
+  if not (files instanceof Array)
+    files = [ files ]
+
+  for file in files
+    fileModuleRequired = true
+    currArgFile = file
+    requireModule path.join process.cwd(), currArgFile
+    if fileModuleRequired
+      console.warn "file #{currArgFile} does not contain an appropriately named module"
+      return
+
+  sourceFiles = options.includeFiles or []
+
+  # ccloader comes after include files
+  if not options.noCcLoader
+    sourceFiles.push(
+      path.join path.dirname(path.dirname __dirname), 'cc', 'loader.js')
+
+  for mod in modulesInDepOrder
+    sourceFiles.push mod.path
+
+  targetCode = modulesToSource sourceFiles, options
+
+  unless options.compileCoffeeOnly
+    unless options.doNotMinify
+      ast = uglParser.parse targetCode
+      ast = uglifier.ast_mangle ast
+      ast = uglifier.ast_squeeze ast
+      oldLen = targetCode.length
+      targetCode = uglifier.gen_code ast
+      newLen = targetCode.length
+      if verbose
+        console.warn "old code length: #{oldLen}, after minifying: #{newLen} " +
+                     "saved #{oldLen - newLen}"
+
+
+    targetCode = '"use strict";' + targetCode if options.useStrict
+    if not outputPath
+      console.log targetCode
+    else
+      fs.writeFileSync(outputPath, targetCode)
+
+exports.run = (argv, options) ->
+  options = {} unless options
 
   if argv.length < 3
     do usage
@@ -153,14 +201,17 @@ exports.run = (argv) ->
   while argv[argvIdx] and argv[argvIdx][0] == '-'
     switch argv[argvIdx]
       when '-c'
-        options.compileCoffeOnly = true
+        options.compileCoffeeOnly = true
       when '-C'
         options.doNotCompileCoffee = true
       when '-i'
         ++argvIdx
         newFile = argv[argvIdx]
         throw "-i requires argument" unless newFile
-        sourceFiles.push newFile
+        if options.includeFiles
+          options.includeFiles.push newFile
+        else
+          options.includeFiles = [ newFile ]
       when '-l'
         options.noCcLoader = true
       when '-s'
@@ -168,7 +219,7 @@ exports.run = (argv) ->
       when '-m'
         options.doNotMinify = true
       when '-v'
-        options.verbose = true
+        __verbose = true
       when '-h'
         do usage
         return
@@ -180,55 +231,30 @@ exports.run = (argv) ->
         return
     ++argvIdx
 
-  verbose "options:", JSON.stringify options
-
   if not argv[argvIdx]
     console.warn "must supply at least one file"
     do usage
     return
 
+  verbose "options:", JSON.stringify options
+
+  files = []
   while argv[argvIdx]
-    fileModuleRequired = true
-    currArgFile = argv[argvIdx]
-    requireModule path.join process.cwd(), currArgFile
-    if fileModuleRequired
-      console.warn "file #{currArgFile} does not contain an appropriately named module"
-      return
+    files.push argv[argvIdx]
     ++argvIdx
 
-  # ccloader comes after include files
-  if not options.noCcLoader
-    sourceFiles.push(
-      path.join path.dirname(path.dirname __dirname), 'cc', 'loader.js')
-
-  for mod in modulesInDepOrder
-    sourceFiles.push mod.path
-
-  targetCode = modulesToSource sourceFiles
-  unless options.doNotMinify
-    ast = uglParser.parse targetCode
-    ast = uglifier.ast_mangle ast
-    ast = uglifier.ast_squeeze ast
-    oldLen = targetCode.length
-    targetCode = uglifier.gen_code ast
-    newLen = targetCode.length
-    if verbose
-      console.warn "old code length: #{oldLen}, after minifying: #{newLen} " +
-                   "saved #{oldLen - newLen}"
-
-  console.log '"use strict";' if options.useStrict
-  console.log targetCode
+  bake files, options
 
 # outputs modules in order given
-modulesToSource = (files) ->
+modulesToSource = (files, options) ->
   targetCode = ''
 
   outputJs = (path) ->
-    targetCode += fs.readFileSync(path).toString() unless options.compileCoffeOnly
+    targetCode += fs.readFileSync(path).toString() unless options.compileCoffeeOnly
 
   outputCoffee = (root) ->
     jsCode = coffee.compile(fs.readFileSync("#{root}.coffee").toString())
-    targetCode += jsCode unless options.compileCoffeOnly
+    targetCode += jsCode unless options.compileCoffeeOnly
     fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileCoffee
 
   for file in files

@@ -1,5 +1,6 @@
 path   = require 'path'
 ake    = require 'cc.ake'
+bkr    = require './lib/cc/baker'
 
 # add node_modules binaries to head of path
 do ake.nodeModulePath
@@ -16,7 +17,11 @@ task 'test', 'test cc.loader', (options) ->
   ake.assert ake.invoke('web'),
     'ln -sf ../cc test'
     'cp -n node_modules/joose/joose-all-web.js test/joose.js'
-    './bin/ccbaker -i test/joose.js test/lib/root.js test/lib/joose/root.js > test/lib/packed.js'
+    ->
+      bkr.bake [ 'test/lib/root.js', 'test/lib/joose/root.js' ],
+        'test/lib/packed.js'
+        includeFiles: [ 'test/joose.js' ], doNotMinify: true
+
     'coffee -c test/lib/incmissing.coffee'
     ->
       express = require 'express'
