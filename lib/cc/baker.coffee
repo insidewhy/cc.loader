@@ -5,17 +5,22 @@ coffee = require 'coffee-script'
 uglParser = require("uglify-js").parser
 uglifier = require("uglify-js").uglify
 
-libdir = null # full path to root of library tree
-modules = {}
-modulesInDepOrder = [] # modules ordered with dependencies first
-
-currFilePath = null # path of current file being required
-currArgFile = null # current file from argv being processed
-currFileMods = [] # modules in current file being processed
-fileModuleRequired = true
-# true when the module with the name of the current file is required
+# globals.. see reset function.
+# globals are necessary to intercept modules loads.
+libdir = modules = modulesInDepOrder = currFilePath = null
+currArgFile = currFileMods = fileModuleRequired = null
 
 __verbose = false
+
+reset = ->
+  libdir = null # full path to root of library tree
+  modules = {}
+  modulesInDepOrder = [] # modules ordered with dependencies first
+
+  currFilePath = null # path of current file being required
+  currArgFile = null # current file from argv being processed
+  currFileMods = [] # modules in current file being processed
+  fileModuleRequired = true
 
 verbose = (tolog...) ->
   return unless __verbose
@@ -78,6 +83,14 @@ class Module
     this
 
 requireModule = (path) ->
+  # ccbaker relies on re-running stuff in global scope on module require, so
+  # the module must be deleted from the cache if it is there
+  if /\.(js|coffee)/.test path
+    delete require.cache[path]
+  else
+    delete require.cache[path + ".js"]
+    delete require.cache[path + ".coffee"]
+
   currFilePath = path
   require path
 
@@ -144,6 +157,7 @@ usage = () ->
         -v            print extra information to the terminal on stderr"""
 
 exports.bake = bake = (files, outputPath, options) ->
+  do reset
   if not options
     options = outputPath
     outputPath = null
