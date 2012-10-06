@@ -3,7 +3,7 @@
 cc.module('punch').empty()
 
 cc.module('root')
-  .requires('dropper', 'friend', 'funct', 'functo')
+  .requires('dropper', 'friend', 'funct', 'functo', 'pandar')
   .defines (function() {
     friend.log(friend.hero)
     jconsole.log(funct())

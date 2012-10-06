@@ -1,0 +1,4 @@
+cc.module('pandar').requires('friend').defines(-> {
+  this.pump = 'fist'
+  jconsole.log("pump the " + this.pump)
+})

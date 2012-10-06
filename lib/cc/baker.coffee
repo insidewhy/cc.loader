@@ -2,6 +2,7 @@ console = require 'console'
 path = require 'path'
 fs = require 'fs'
 coffee = require 'coffee-script'
+chamomile = require 'chamomile'
 uglParser = require("uglify-js").parser
 uglifier = require("uglify-js").uglify
 
@@ -85,11 +86,12 @@ class Module
 requireModule = (path) ->
   # ccbaker relies on re-running stuff in global scope on module require, so
   # the module must be deleted from the cache if it is there
-  if /\.(js|coffee)/.test path
+  if /\.(js|coffee|chmo)/.test path
     delete require.cache[path]
   else
     delete require.cache[path + ".js"]
     delete require.cache[path + ".coffee"]
+    delete require.cache[path + ".chmo"]
 
   currFilePath = path
   require path
@@ -146,6 +148,7 @@ usage = () ->
       arguments:
         -c            compile coffeescript modules to javascript only
         -C            do not compile coffeescript to javascript
+        -H            do not compile chamomile to javascript
         -i [path]     include raw source file before modules, can be used
                       multiple times
         -l            do not include cc.loader in output
@@ -218,6 +221,8 @@ exports.run = (argv, options) ->
         options.compileCoffeeOnly = true
       when '-C'
         options.doNotCompileCoffee = true
+      when '-H'
+        options.doNotCompileChamomile = true
       when '-i'
         ++argvIdx
         newFile = argv[argvIdx]
@@ -271,13 +276,22 @@ modulesToSource = (files, options) ->
     targetCode += jsCode unless options.compileCoffeeOnly
     fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileCoffee
 
+  outputChamomile = (root) ->
+    jsCode = chamomile(fs.readFileSync("#{root}.chmo").toString())
+    targetCode += jsCode
+    fs.writeFileSync("#{root}.js", jsCode) unless options.doNotCompileChamomile
+
   for file in files
     if /\.js$/.test file
       outputJs file
     else if /\.coffee$/.test file
-      outputCoffee file.replace /\.coffee$/, ''
+      outputCoffee file.replace(/\.coffee$/, '')
+    else if /\.chmo$/.test file
+      outputChamomile file.replace(/\.chmo$/, '')
     else if fs.existsSync "#{file}.coffee"
       outputCoffee file
+    else if fs.existsSync "#{file}.chmo"
+      outputChamomile file
     else
       outputJs "#{file}.js"
 
